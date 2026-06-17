@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Light Leaks — the merch drop by Zachary Caesar. Available now." />
+  <title>light leaks. — zachary caesar.</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/animations.css" />
+</head>
+<body>
+
+  <!-- ── Ambient background orbs ── -->
+  <div class="bg-ambient" aria-hidden="true">
+    <div class="orb orb-gold"></div>
+    <div class="orb orb-blue"></div>
+    <div class="orb orb-red"></div>
+    <div class="orb orb-pale"></div>
+  </div>
+
+  <!-- ── Light ray ── -->
+  <div class="bg-ray" aria-hidden="true">
+    <div class="ray"></div>
+    <div class="ray ray-2"></div>
+  </div>
+
+  <!-- ── Nav ── -->
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Zachary Caesar home">
+      <img src="assets/img/logo-black.png" alt="Zachary Caesar"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
+      <span class="brand-fallback" style="display:none">ZC</span>
+    </a>
+
+    <nav class="topnav" aria-label="Main navigation">
+      <a href="light-leaks.html">light leaks</a>
+      <a href="merch.html">shop</a>
+      <a href="music.html">music</a>
+      <a href="about.html">about</a>
+    </nav>
+
+    <div class="topbar-right"></div>
+  </header>
+
+  <main>
+
+    <section class="ll-hero">
+      <p class="hero-eyebrow" data-reveal>ZACHARY CAESAR</p>
+      <h1 class="hero-title" data-reveal data-delay="1">
+        <span>light</span>
+        <span>leaks.</span>
+      </h1>
+      <p class="hero-sub" data-reveal data-delay="2">AVAILABLE NOW</p>
+      <div class="ll-cta" data-reveal data-delay="3">
+        <a class="btn btn-fill" href="merch.html">SHOP THE DROP</a>
+        <a class="btn" href="music.html">HEAR THE MUSIC</a>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-inner">
+        <span>LIGHT LEAKS</span><span class="dot">·</span>
+        <span>EYES</span><span class="dot">·</span>
+        <span>GOD RAYS</span><span class="dot">·</span>
+        <span>ABERRATION</span><span class="dot">·</span>
+        <span>GLASS</span><span class="dot">·</span>
+        <span>DISTORTION</span><span class="dot">·</span>
+        <span>SIGNAL LOSS</span><span class="dot">·</span>
+        <span>ZACHARY CAESAR</span><span class="dot">·</span>
+        <span>LIGHT LEAKS</span><span class="dot">·</span>
+        <span>EYES</span><span class="dot">·</span>
+        <span>GOD RAYS</span><span class="dot">·</span>
+        <span>ABERRATION</span><span class="dot">·</span>
+        <span>GLASS</span><span class="dot">·</span>
+        <span>DISTORTION</span><span class="dot">·</span>
+        <span>SIGNAL LOSS</span><span class="dot">·</span>
+        <span>ZACHARY CAESAR</span><span class="dot">·</span>
+      </div>
+    </div>
+
+    <div class="tiles" data-reveal>
+      <div class="tiles-row">
+
+        <div class="tile tile--featured" style="grid-column: span 2; min-height: 280px;" data-tilt>
+          <span class="tile-name" style="font-size:clamp(1.6rem,4.5vw,3rem);line-height:1.05;">
+            eyes.<br>god rays.<br>aberration.
+          </span>
+          <span class="tile-hint">STREETWEAR</span>
+          <span class="tile-bg-text" aria-hidden="true">LL</span>
+        </div>
+
+        <div class="tile" style="flex-direction:column;align-items:flex-start;gap:14px;" data-tilt>
+          <span class="label">THE CONCEPT</span>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.72;font-family:var(--font);font-weight:400;">
+            A visual world built around light, lens, and the eye.
+            More details coming soon.
+          </p>
+          <a class="btn btn-fill" href="merch.html" style="margin-top:auto;">SHOP NOW</a>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <span class="footer-text">© 2026 Zachary Caesar</span>
+    <span class="footer-text">LIGHT LEAKS DROP</span>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/scroll-effects.js"></script>
+  <script src="assets/js/gesture.js"></script>
+  <script src="assets/js/noise.js"></script>
+</body>
+</html>

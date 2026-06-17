@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zachary Caesar</title>
+  <meta name="description" content="Zachary Caesar — music artist. Light Leaks available now." />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/animations.css" />
+</head>
+<body>
+
+  <!-- ── Animated background orbs ── -->
+  <div class="bg-ambient" aria-hidden="true">
+    <div class="orb orb-gold"></div>
+    <div class="orb orb-blue"></div>
+    <div class="orb orb-red"></div>
+    <div class="orb orb-pale"></div>
+  </div>
+
+  <!-- ── Light ray sweeps ── -->
+  <div class="bg-ray" aria-hidden="true">
+    <div class="ray"></div>
+    <div class="ray ray-2"></div>
+  </div>
+
+  <!-- ── Nav ── -->
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Zachary Caesar home">
+      <img src="assets/img/logo-black.png" alt="Zachary Caesar"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
+      <span class="brand-fallback" style="display:none">ZC</span>
+    </a>
+
+    <nav class="topnav" aria-label="Main navigation">
+      <a href="light-leaks.html">light leaks</a>
+      <a href="merch.html">shop</a>
+      <a href="music.html">music</a>
+      <a href="about.html">about</a>
+    </nav>
+
+    <div class="topbar-right"><!-- spacer for grid balance --></div>
+  </header>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+
+    <!-- Animated interactive eye — sits behind all text -->
+    <div id="zc-eye-container" aria-hidden="true">
+      <svg class="zc-eye-svg" viewBox="0 0 500 250" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="zc-iris-grad" cx="50%" cy="48%" r="50%">
+            <stop offset="0%"   stop-color="#E8C270" stop-opacity="1" />
+            <stop offset="22%"  stop-color="#C09040" stop-opacity="1" />
+            <stop offset="55%"  stop-color="#7A5820" stop-opacity="1" />
+            <stop offset="100%" stop-color="#2E1A06" stop-opacity="1" />
+          </radialGradient>
+          <radialGradient id="zc-pupil-grad" cx="50%" cy="44%" r="50%">
+            <stop offset="0%"   stop-color="#0A0806" stop-opacity="1" />
+            <stop offset="100%" stop-color="#1A1209" stop-opacity="1" />
+          </radialGradient>
+          <radialGradient id="zc-sclera-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#F8F2E8" stop-opacity="0.90" />
+            <stop offset="60%"  stop-color="#EFE9DF" stop-opacity="0.80" />
+            <stop offset="100%" stop-color="#D8CFC0" stop-opacity="0.70" />
+          </radialGradient>
+          <clipPath id="zc-eye-clip">
+            <path d="M 42,125 Q 250,18 458,125 Q 250,232 42,125 Z"/>
+          </clipPath>
+          <filter id="zc-blur-slight">
+            <feGaussianBlur stdDeviation="0.8"/>
+          </filter>
+        </defs>
+
+        <!-- Sclera (white of eye) -->
+        <ellipse id="zc-sclera" cx="250" cy="125" rx="210" ry="80"
+                 fill="url(#zc-sclera-grad)" clip-path="url(#zc-eye-clip)"/>
+
+        <!-- Iris -->
+        <circle id="zc-iris" cx="250" cy="125" r="58"
+                fill="url(#zc-iris-grad)" filter="url(#zc-blur-slight)"/>
+
+        <!-- Pupil (moves with cursor) -->
+        <circle id="zc-pupil" cx="250" cy="125" r="28"
+                fill="url(#zc-pupil-grad)"/>
+
+        <!-- Iris inner detail ring -->
+        <circle id="zc-iris-detail" cx="250" cy="125" r="52"
+                fill="none" stroke="rgba(192,144,64,0.35)" stroke-width="1.5"/>
+
+        <!-- Corneal highlight -->
+        <ellipse id="zc-highlight" cx="226" cy="105" rx="10" ry="7"
+                 fill="rgba(255,250,240,0.75)" transform="rotate(-20 226 105)"/>
+
+        <!-- Eyelids — drawn on top to frame the eye -->
+        <g class="zc-eyelids" clip-path="url(#zc-eye-clip)">
+          <!-- Upper lid shadow -->
+          <path d="M 42,125 Q 250,18 458,125"
+                fill="none" stroke="rgba(14,12,8,0.6)" stroke-width="2.5"
+                stroke-linecap="round"/>
+          <!-- Lower lid shadow -->
+          <path d="M 42,125 Q 250,232 458,125"
+                fill="none" stroke="rgba(14,12,8,0.38)" stroke-width="1.5"
+                stroke-linecap="round"/>
+        </g>
+
+        <!-- Eyelashes — upper -->
+        <g id="zc-lashes-upper" stroke="rgba(14,12,8,0.55)" stroke-linecap="round" fill="none">
+          <line x1="130" y1="96"  x2="118" y2="82"  stroke-width="1.5"/>
+          <line x1="165" y1="78"  x2="157" y2="62"  stroke-width="1.4"/>
+          <line x1="205" y1="64"  x2="200" y2="47"  stroke-width="1.4"/>
+          <line x1="250" y1="58"  x2="250" y2="40"  stroke-width="1.5"/>
+          <line x1="295" y1="64"  x2="300" y2="47"  stroke-width="1.4"/>
+          <line x1="335" y1="78"  x2="343" y2="62"  stroke-width="1.4"/>
+          <line x1="370" y1="96"  x2="382" y2="82"  stroke-width="1.5"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Text content (z-index: 1, above the eye) -->
+    <p class="hero-eyebrow" data-reveal>ZACHARY CAESAR</p>
+
+    <h1 class="hero-title" data-reveal data-delay="1">
+      <span>light</span>
+      <span>leaks.</span>
+    </h1>
+
+    <p class="hero-sub" data-reveal data-delay="2">AVAILABLE NOW</p>
+
+  </section>
+
+  <!-- ── Marquee ── -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-inner">
+      <span>LIGHT LEAKS</span><span class="dot">·</span>
+      <span>ZACHARY CAESAR</span><span class="dot">·</span>
+      <span>AVAILABLE NOW</span><span class="dot">·</span>
+      <span>EYES. GOD RAYS. ABERRATION.</span><span class="dot">·</span>
+      <span>MERCH DROP 2026</span><span class="dot">·</span>
+      <span>LIGHT LEAKS</span><span class="dot">·</span>
+      <span>ZACHARY CAESAR</span><span class="dot">·</span>
+      <span>AVAILABLE NOW</span><span class="dot">·</span>
+      <span>EYES. GOD RAYS. ABERRATION.</span><span class="dot">·</span>
+      <span>MERCH DROP 2026</span><span class="dot">·</span>
+    </div>
+  </div>
+
+  <!-- ── Navigation tiles ── -->
+  <div class="tiles" role="navigation" aria-label="Site sections">
+
+    <!-- Featured — Light Leaks drop -->
+    <a class="tile tile--featured" href="light-leaks.html" data-tilt data-reveal>
+      <div>
+        <span class="tile-hint">CURRENT DROP</span>
+        <p class="tile-name">light leaks.</p>
+      </div>
+      <div class="tile-bg-text" aria-hidden="true">LL</div>
+    </a>
+
+    <!-- Three smaller tiles -->
+    <div class="tiles-row">
+      <a class="tile tile--shop" href="merch.html" data-tilt data-reveal data-delay="1">
+        <p class="tile-name">shop.</p>
+        <div class="tile-bg-text" aria-hidden="true">$</div>
+      </a>
+      <a class="tile tile--music" href="music.html" data-tilt data-reveal data-delay="2">
+        <p class="tile-name">music.</p>
+        <div class="tile-bg-text" aria-hidden="true">♪</div>
+      </a>
+      <a class="tile tile--about" href="about.html" data-tilt data-reveal data-delay="3">
+        <p class="tile-name">about.</p>
+        <div class="tile-bg-text" aria-hidden="true">ZC</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <span class="footer-text">© 2026 Zachary Caesar</span>
+    <span class="footer-text">zachary-caesar.github.io</span>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/scroll-effects.js"></script>
+  <script src="assets/js/gesture.js"></script>
+  <script src="assets/js/eye.js"></script>
+  <script src="assets/js/noise.js"></script>
+</body>
+</html>

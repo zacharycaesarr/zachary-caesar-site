@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Music — Zachary Caesar discography." />
+    <title>music. — zachary caesar.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/animations.css" />
+  </head>
+  <body>
+
+    <div class="bg-ambient" aria-hidden="true">
+      <div class="orb orb-gold"></div>
+      <div class="orb orb-blue"></div>
+      <div class="orb orb-red"></div>
+      <div class="orb orb-pale"></div>
+    </div>
+    <div class="bg-ray" aria-hidden="true">
+      <div class="ray"></div>
+      <div class="ray ray-2"></div>
+    </div>
+
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Home">
+        <img src="assets/img/logo-black.png" alt="Zachary Caesar"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
+        <span class="brand-fallback" style="display:none">ZC</span>
+      </a>
+      <nav class="topnav" aria-label="Main navigation">
+        <a href="light-leaks.html">light leaks</a>
+        <a href="merch.html">shop</a>
+        <a href="music.html">music</a>
+        <a href="about.html">about</a>
+      </nav>
+      <div class="topbar-right"></div>
+    </header>
+
+    <main>
+
+      <div class="page-header" data-reveal>
+        <p class="label">DISCOGRAPHY</p>
+        <h1 class="page-title">music.</h1>
+      </div>
+
+      <!--
+        ALBUM CARDS
+        ─────────────────────────────────────────────
+        Click / tap any card to reveal the tracklist.
+        Update:
+          • .album-art-placeholder initials → <img src="..."> for album art
+          • .album-title text
+          • .album-year text
+          • .track-name text for each track
+          • Streaming links in .tracklist-footer
+        ─────────────────────────────────────────────
+      -->
+
+      <div class="album-grid">
+
+        <!-- 01 · LIGHT LEAKS (latest) -->
+        <div class="album-card" data-reveal data-tilt>
+          <div class="album-art">
+            <div class="album-art-placeholder">LL</div>
+          </div>
+          <div class="album-meta">
+            <div class="album-title">LIGHT LEAKS</div>
+            <div class="album-year">2026</div>
+          </div>
+          <div class="album-footer">
+            <span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span>
+          </div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top">
+              <span class="tracklist-album-name">LIGHT LEAKS</span>
+              <button class="tracklist-close">CLOSE</button>
+            </div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">04</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">05</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 02 · Good November -->
+        <div class="album-card" data-reveal data-delay="1" data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">GN</div></div>
+          <div class="album-meta">
+            <div class="album-title">Good November</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">GOOD NOVEMBER</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 03 · If Not Now -->
+        <div class="album-card" data-reveal data-delay="2" data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">INN</div></div>
+          <div class="album-meta">
+            <div class="album-title">If Not Now</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">IF NOT NOW</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 · Calliope -->
+        <div class="album-card" data-reveal data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">CA</div></div>
+          <div class="album-meta">
+            <div class="album-title">Calliope</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">CALLIOPE</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 · BFTD -->
+        <div class="album-card" data-reveal data-delay="1" data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">BF</div></div>
+          <div class="album-meta">
+            <div class="album-title">BFTD</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">BFTD</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 06 · Sincerely Yours -->
+        <div class="album-card" data-reveal data-delay="2" data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">SY</div></div>
+          <div class="album-meta">
+            <div class="album-title">Sincerely Yours</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">SINCERELY YOURS</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 07 · INFO -->
+        <div class="album-card" data-reveal data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">IN</div></div>
+          <div class="album-meta">
+            <div class="album-title">INFO</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">INFO</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 08 · Resemblance -->
+        <div class="album-card" data-reveal data-delay="1" data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">RE</div></div>
+          <div class="album-meta">
+            <div class="album-title">Resemblance</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">RESEMBLANCE</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 09 · Sides -->
+        <div class="album-card" data-reveal data-delay="2" data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">SI</div></div>
+          <div class="album-meta">
+            <div class="album-title">Sides</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">SIDES</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 · With Much Love EP -->
+        <div class="album-card" data-reveal data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">WM</div></div>
+          <div class="album-meta">
+            <div class="album-title">With Much Love EP</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">WITH MUCH LOVE EP</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11 · Nosedive (oldest) -->
+        <div class="album-card" data-reveal data-delay="1" data-tilt>
+          <div class="album-art"><div class="album-art-placeholder">ND</div></div>
+          <div class="album-meta">
+            <div class="album-title">Nosedive</div>
+            <div class="album-year">—</div>
+          </div>
+          <div class="album-footer"><span style="font-family:var(--font);font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);">TAP FOR TRACKLIST</span></div>
+          <div class="tracklist-panel">
+            <div class="tracklist-top"><span class="tracklist-album-name">NOSEDIVE</span><button class="tracklist-close">CLOSE</button></div>
+            <div class="track-list">
+              <div class="track-item"><span class="track-num">01</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">02</span><span class="track-name">Track title</span></div>
+              <div class="track-item"><span class="track-num">03</span><span class="track-name">Track title</span></div>
+            </div>
+            <div class="tracklist-footer">
+              <a class="btn btn-fill" href="#" target="_blank" rel="noreferrer">SPOTIFY</a>
+              <a class="btn" href="#" target="_blank" rel="noreferrer">APPLE MUSIC</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span class="footer-text">© <span data-year></span> ZACHARY CAESAR</span>
+      <span class="footer-text">DISCOGRAPHY</span>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/scroll-effects.js"></script>
+    <script src="assets/js/gesture.js"></script>
+    <script src="assets/js/noise.js"></script>
+  </body>
+</html>
