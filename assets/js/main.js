@@ -53,6 +53,18 @@
     });
   }
 
+  /* ── Scroll hint: hide after first scroll ──────── */
+  const scrollHint = document.querySelector('.scroll-hint');
+  if (scrollHint) {
+    window.addEventListener('scroll', function hideHint() {
+      if (window.scrollY > 40) {
+        scrollHint.style.transition = 'opacity 0.5s ease';
+        scrollHint.style.opacity = '0';
+        window.removeEventListener('scroll', hideHint);
+      }
+    }, { passive: true });
+  }
+
   /* ── Cart count (updated by Shopify Buy Button JS) */
   window.__zcUpdateCartCount = function (n) {
     document.querySelectorAll('.cart-count').forEach((el) => {

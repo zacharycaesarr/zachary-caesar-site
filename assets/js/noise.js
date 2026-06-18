@@ -1,12 +1,15 @@
 /* ============================================================
    noise.js — animated film-grain overlay via canvas
    Works in all browsers, no SVG security restrictions.
+   Auto-detects mobile and runs lighter for performance.
    ============================================================ */
 (function () {
-  var TILE  = 256;   // noise tile size in px
-  var FPS   = 18;    // grain animation speed
-  var OPAC  = 0.072; // overall opacity (increase for more texture)
-  var TILES = 8;     // number of unique tiles to cycle through
+  var isMobile = ('ontouchstart' in window) || window.matchMedia('(max-width: 768px)').matches;
+
+  var TILE  = isMobile ? 180 : 256;  // noise tile size in px
+  var FPS   = isMobile ?  8  : 18;   // grain animation speed
+  var OPAC  = isMobile ? 0.05 : 0.072; // overall opacity
+  var TILES = isMobile ?  3  : 8;    // unique tiles to cycle through
 
   /* Generate a single grayscale noise tile */
   function makeTile() {

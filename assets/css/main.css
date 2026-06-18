@@ -1034,6 +1034,73 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--muted);
 }
 
+/* ── Active nav link ─────────────────────────────── */
+
+.topnav a[aria-current="page"] {
+  color: var(--fg);
+  position: relative;
+}
+
+.topnav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+/* ── Scroll hint ─────────────────────────────────── */
+
+.scroll-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  opacity: 0;
+  animation: fade-in-hint 0.8s ease 2.2s forwards;
+  pointer-events: none;
+}
+
+.scroll-hint-label {
+  font-family: var(--font);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scroll-hint-track {
+  width: 1px;
+  height: 36px;
+  background: rgba(14,13,11,0.12);
+  position: relative;
+  overflow: hidden;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.scroll-hint-dot {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: scroll-dot 1.8s ease-in-out infinite;
+  margin-left: -1px;
+}
+
 /* ── Responsive ──────────────────────────────────── */
 
 @media (max-width: 720px) {
@@ -1060,5 +1127,64 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 420px) {
-  .topnav { gap: 10px; }
+  .topnav { gap: 8px; }
+  .topnav a, .cart-btn { font-size: 0.6rem; letter-spacing: 0.08em; }
+}
+
+/* ── Mobile performance ──────────────────────────────
+   Visually identical — reduces GPU/CPU load on phones.
+   Backdrop-filter blur is the #1 cost on mobile Safari.
+   ──────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+
+  /* Halve blur radii (2–3× faster compositing) */
+  .topbar {
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  }
+
+  .tile {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .album-card, .product-card, .social-link {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .quick-view, .tracklist-panel {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Light rays off — large composited layer, big perf hit */
+  .bg-ray { display: none; }
+
+  /* Fewer orbs, smaller, less blur */
+  .orb-pale  { display: none; }
+  .orb       { filter: blur(55px); }
+  .orb-gold  { width: 380px; height: 380px; animation-duration: 28s; }
+  .orb-blue  { width: 320px; height: 320px; animation-duration: 36s; }
+  .orb-red   { width: 240px; height: 240px; animation-duration: 24s; }
+
+  /* Eye animation runs on composited layer — keep, just simplify */
+  .zc-eye-svg { animation: none; opacity: 0.20; }
+
+  /* Tile hover transform — disable 3D tilt on mobile */
+  [data-tilt] { transform: none !important; }
+
+  /* Promote orbs to GPU layers */
+  .orb { will-change: transform; }
+}
+
+/* Respect OS-level reduce-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .orb, .ray { display: none; }
 }
