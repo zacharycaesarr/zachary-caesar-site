@@ -1,0 +1,339 @@
+/* ============================================================
+   LIGHT LEAKS — Page-specific styles
+   Only loaded on light-leaks.html
+   ============================================================ */
+
+/* ── Page setup: no scroll, full height ─────────── */
+
+.ll-page {
+  overflow: hidden;
+  height: 100svh;
+}
+
+/* Topbar is fixed on this page (sticky doesn't work with overflow:hidden) */
+.ll-page .topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+/* ── Phase 1-A: Intro title card ─────────────────── */
+
+#ll-intro {
+  position: fixed;
+  inset: 0;
+  top: 52px; /* below topbar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+  pointer-events: none;
+  transition: opacity 800ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#ll-intro.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#ll-intro-title {
+  font-family: var(--font);
+  font-size: clamp(4.5rem, 16vw, 12rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.86;
+  text-align: center;
+  user-select: none;
+  /* Same shimmer gradient as homepage hero */
+  background: linear-gradient(
+    108deg,
+    var(--fg)          10%,
+    var(--accent)      40%,
+    var(--accent-cool) 52%,
+    var(--fg)          72%,
+    var(--fg)          100%
+  );
+  background-size: 260% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ll-shimmer 7s linear infinite;
+  padding: 0 10px;
+}
+
+#ll-intro-title span { display: block; }
+
+@keyframes ll-shimmer {
+  from { background-position: 200% center; }
+  to   { background-position: -200% center; }
+}
+
+/* ── Phase 1-B: Main scene ───────────────────────── */
+
+#ll-scene {
+  position: fixed;
+  inset: 0;
+  top: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 10;
+  opacity: 0;
+  /* transition for scene exit (flashlight) */
+  transition: opacity 500ms ease;
+}
+
+#ll-scene.visible {
+  opacity: 1;
+}
+
+/* ── Eye wrapper ─────────────────────────────────── */
+
+#ll-eye-wrap {
+  width: min(72vw, 520px);
+  opacity: 0;
+  transform: scale(0.78);
+  transition:
+    opacity 1100ms cubic-bezier(0.25, 1, 0.4, 1),
+    transform 1300ms cubic-bezier(0.25, 1, 0.4, 1);
+}
+
+#ll-eye-wrap.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#ll-eye-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Blink: applied directly to SVG via JS transform */
+#ll-eye-svg {
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+/* Iris widen ─────────────────────────────────────── */
+
+#ll-iris {
+  transform-box:   fill-box;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes ll-iris-widen {
+  0%   { transform: scale(1); }
+  22%  { transform: scale(1.38); }
+  45%  { transform: scale(1.18); }
+  65%  { transform: scale(1.32); }
+  82%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+#ll-iris.widen {
+  animation: ll-iris-widen 1.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* ── Tagline: "WATCH THE LIGHT BLEED" ───────────── */
+
+#ll-tagline {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.ll-word {
+  font-family: var(--font);
+  font-size: clamp(0.72rem, 2.5vw, 1.1rem);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--fg);
+  opacity: 0;
+  filter: blur(12px);
+  transform: translateY(8px);
+  transition:
+    opacity  650ms cubic-bezier(0.25, 1, 0.4, 1),
+    filter   650ms cubic-bezier(0.25, 1, 0.4, 1),
+    transform 650ms cubic-bezier(0.25, 1, 0.4, 1);
+}
+
+.ll-word.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* ── Action buttons ──────────────────────────────── */
+
+#ll-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.ll-btn {
+  font-family: var(--font);
+  font-size: clamp(0.66rem, 2.2vw, 0.84rem);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity   750ms cubic-bezier(0.25, 1, 0.4, 1),
+    transform 750ms cubic-bezier(0.25, 1, 0.4, 1),
+    color     130ms ease;
+  padding: 8px 4px;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ll-btn:hover  { color: var(--accent); }
+.ll-btn:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.ll-btn.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Examine Source button — special: pulse glow to draw attention */
+#ll-btn-examine {
+  color: var(--fg);
+}
+
+#ll-btn-examine.gazing {
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(192,144,64,0.5);
+  animation: ll-btn-glow 1.5s ease-in-out 2;
+}
+
+@keyframes ll-btn-glow {
+  0%, 100% { text-shadow: 0 0  8px rgba(192,144,64,0.3); }
+  50%       { text-shadow: 0 0 20px rgba(192,144,64,0.8); }
+}
+
+/* ══════════════════════════════════════════════════
+   PHASE 2  Flashlight / Examine Source
+   ══════════════════════════════════════════════════ */
+
+#ll-flashlight {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#ll-flashlight.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The dark veil — mask-image punched by JS to make the flashlight beam */
+#ll-dark {
+  position: absolute;
+  inset: 0;
+  background: #0A0806;
+  /* mask-image is set inline by light-leaks.js for cross-browser support */
+  will-change: mask-image, -webkit-mask-image;
+}
+
+/* ── Hidden reveal text layer ─────────────────────
+   Sits between ll-dark (behind it) and ll-dark's mask.
+   Revealed text is visible wherever the mask is transparent.
+   ─────────────────────────────────────────────── */
+
+#ll-hidden-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Sits BEHIND ll-dark via z-index so only visible through the mask hole */
+  z-index: 0;
+}
+
+/* ll-dark needs to be above the hidden layer */
+#ll-dark {
+  z-index: 1;
+}
+
+.ll-rt {
+  position: absolute;
+  font-family: var(--font);
+  font-size: clamp(0.7rem, 2.8vw, 1.05rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(240, 232, 218, 0.82);
+  transform: rotate(calc(var(--rot, 0) * 1deg));
+  white-space: nowrap;
+  /* Chromatic aberration — the "distorted" visual */
+  text-shadow:
+    -3px 0  rgba(220, 48,  48, 0.85),
+     3px 0  rgba(48,  88, 220, 0.85),
+     0   1px rgba(255,255,255, 0.12);
+  mix-blend-mode: screen;
+  user-select: none;
+}
+
+/* ── Close / reset button ───────────────────────── */
+
+#ll-close {
+  position: absolute;
+  top: 68px; /* below topbar */
+  right: 22px;
+  z-index: 2;
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1;
+  color: rgba(240, 232, 218, 0.55);
+  background: transparent;
+  border: 1px solid rgba(240, 232, 218, 0.20);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 180ms, border-color 180ms, background 180ms;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#ll-close:hover {
+  color: #fff;
+  border-color: rgba(240, 232, 218, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Mobile tweaks ───────────────────────────────── */
+
+@media (max-width: 600px) {
+  #ll-eye-wrap    { width: min(88vw, 380px); }
+  #ll-intro-title { font-size: clamp(3.8rem, 18vw, 8rem); }
+  #ll-tagline     { gap: 8px; }
+  .ll-word        { letter-spacing: 0.22em; }
+  .ll-btn         { letter-spacing: 0.16em; padding: 10px 4px; }
+}
