@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  /* ── Element refs ────────────────────────────────── */
+  /* ── Element refs ─────────────────────────────── */
   var intro       = document.getElementById('ll-intro');
   var scene       = document.getElementById('ll-scene');
   var eyeWrap     = document.getElementById('ll-eye-wrap');
@@ -23,42 +23,54 @@
   var irisEl      = document.getElementById('ll-iris');
   var pupilEl     = document.getElementById('ll-pupil');
   var highlightEl = document.getElementById('ll-highlight');
+  var irisRingEl  = document.getElementById('ll-iris-ring');
   var words       = taglineEl ? taglineEl.querySelectorAll('.ll-word') : [];
 
   if (!intro || !scene || !eyeWrap) return;
 
-  /* ── Device detection ───────────────────────────── */
+  /* ── Device detection ──────────────────────────── */
   var isTouch = ('ontouchstart' in window) || window.matchMedia('(hover:none)').matches;
 
-  /* ── SVG eye coordinate space ───────────────────── */
-  var CX = 250, CY = 125;   // SVG center
-  var MAX_TRAVEL = 50;       // max pupil offset in SVG units
+  /* ── SVG coordinate space ──────────────────────── */
+  var CX = 250, CY = 125;
+  var MAX_TRAVEL = 50;
 
-  /* Current and target pupil positions (lerped each frame) */
   var curX = CX, curY = CY;
   var tgtX = CX, tgtY = CY;
-
   var trackingMode = 'none'; // 'none' | 'sequence' | 'cursor'
 
-  /* ── Easing helpers ─────────────────────────────── */
   function lerp(a, b, t) { return a + (b - a) * t; }
 
-  /* ── Apply pupil + iris + highlight position ────── */
+  /* ── Apply all eye element positions ──────────────
+     Iris and pupil are SYNCED — they move as one unit.
+     The highlight offset updates its rotation center too.
+  ─────────────────────────────────────────────────── */
   function applyEyePos(x, y) {
     if (!pupilEl || !irisEl) return;
+
     pupilEl.setAttribute('cx', x);
     pupilEl.setAttribute('cy', y);
-    /* Iris follows with less travel (natural parallax) */
-    irisEl.setAttribute('cx', lerp(CX, x, 0.48));
-    irisEl.setAttribute('cy', lerp(CY, y, 0.48));
-    /* Highlight tracks pupil */
+
+    /* Iris stays centered on the pupil (synced, no offset) */
+    irisEl.setAttribute('cx', x);
+    irisEl.setAttribute('cy', y);
+
+    /* Detail ring tracks iris */
+    if (irisRingEl) {
+      irisRingEl.setAttribute('cx', x);
+      irisRingEl.setAttribute('cy', y);
+    }
+
+    /* Highlight: fixed offset from pupil center + keep rotation on itself */
     if (highlightEl) {
-      highlightEl.setAttribute('cx', x + 14);
-      highlightEl.setAttribute('cy', y - 11);
+      var hx = x + 14, hy = y - 11;
+      highlightEl.setAttribute('cx', hx);
+      highlightEl.setAttribute('cy', hy);
+      highlightEl.setAttribute('transform', 'rotate(-18 ' + hx + ' ' + hy + ')');
     }
   }
 
-  /* ── Animation loop ─────────────────────────────── */
+  /* ── Smooth animation loop ─────────────────────── */
   var LERP_SPEED = 0.058;
 
   (function eyeLoop() {
@@ -68,21 +80,36 @@
     requestAnimationFrame(eyeLoop);
   })();
 
-  /* ── Move eye to a direction (sequence mode) ────── */
-  var DIRECTIONS = {
-    forward:      [CX,       CY      ],
-    'down-left':  [CX - 30,  CY + 26 ],
-    'down-center':[CX,       CY + 34 ],
-    'down-right': [CX + 30,  CY + 26 ]
+  /* ── Move eye from a screen coordinate ──────────── */
+  function updateEyeFromScreen(screenX, screenY) {
+    if (!eyeWrap) return;
+    var rect  = eyeWrap.getBoundingClientRect();
+    var ecx   = rect.left + rect.width  / 2;
+    var ecy   = rect.top  + rect.height / 2;
+    var dx    = screenX - ecx;
+    var dy    = screenY - ecy;
+    var dist  = Math.sqrt(dx * dx + dy * dy);
+    var angle = Math.atan2(dy, dx);
+    var travel = Math.min(dist / 5.2, MAX_TRAVEL);
+    tgtX = CX + Math.cos(angle) * travel;
+    tgtY = CY + Math.sin(angle) * travel;
+  }
+
+  /* ── Named gaze directions (intro sequence) ──────── */
+  var DIRS = {
+    forward:       [CX,       CY      ],
+    'down-left':   [CX - 30,  CY + 26 ],
+    'down-center': [CX,       CY + 34 ],
+    'down-right':  [CX + 30,  CY + 26 ]
   };
 
   function eyeLookDirection(dir) {
-    var pos = DIRECTIONS[dir] || DIRECTIONS.forward;
+    var pos = DIRS[dir] || DIRS.forward;
     tgtX = pos[0];
     tgtY = pos[1];
   }
 
-  /* ── Iris widen (signals examine source button) ─── */
+  /* ── Iris widen animation ──────────────────────── */
   function triggerIrisWiden(callback) {
     if (!irisEl) { if (callback) callback(); return; }
     irisEl.classList.add('widen');
@@ -93,28 +120,17 @@
     });
   }
 
-  /* ── Cursor tracking (starts after sequence ends) ── */
+  /* ── Cursor tracking (post-sequence) ──────────── */
   function startCursorTracking() {
     trackingMode = 'cursor';
-    LERP_SPEED = 0.072; // slightly snappier in tracking mode
+    LERP_SPEED   = 0.072;
 
     if (!isTouch) {
-      /* Desktop: follow mouse */
       document.addEventListener('mousemove', function (e) {
-        if (trackingMode !== 'cursor') return;
-        var rect  = eyeWrap.getBoundingClientRect();
-        var ecx   = rect.left + rect.width  / 2;
-        var ecy   = rect.top  + rect.height / 2;
-        var dx    = e.clientX - ecx;
-        var dy    = e.clientY - ecy;
-        var dist  = Math.sqrt(dx * dx + dy * dy);
-        var angle = Math.atan2(dy, dx);
-        var travel = Math.min(dist / 5.2, MAX_TRAVEL);
-        tgtX = CX + Math.cos(angle) * travel;
-        tgtY = CY + Math.sin(angle) * travel;
+        if (trackingMode !== 'cursor' || flActive) return;
+        updateEyeFromScreen(e.clientX, e.clientY);
       }, { passive: true });
     } else {
-      /* Mobile: random wander — more pronounced than homepage */
       var wander = function () {
         if (trackingMode !== 'cursor') return;
         var angle  = Math.random() * Math.PI * 2;
@@ -127,12 +143,12 @@
     }
   }
 
-  /* ── Blink ──────────────────────────────────────── */
+  /* ── Blink ─────────────────────────────────────── */
   function scheduleBlink() {
-    setTimeout(function doBlink() {
+    setTimeout(function () {
       if (!eyeSvg) return;
-      eyeSvg.style.transition = 'transform 65ms ease-in';
-      eyeSvg.style.transform  = 'scaleY(0.04)';
+      eyeSvg.style.transition      = 'transform 65ms ease-in';
+      eyeSvg.style.transform       = 'scaleY(0.04)';
       eyeSvg.style.transformOrigin = '50% 50%';
       setTimeout(function () {
         eyeSvg.style.transition = 'transform 110ms ease-out';
@@ -144,62 +160,64 @@
 
   /* ════════════════════════════════════════════════
      PHASE 1 — INTRO SEQUENCE
-     ════════════════════════════════════════════════ */
+  ════════════════════════════════════════════════ */
 
+  /* Fade intro in on load (smooth appearance) */
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      intro.classList.add('visible');
+    });
+  });
+
+  /* Sequence timing (ms) */
   var T = {
-    hold:        2500,   // hold "LIGHT LEAKS" title card
-    eyeReveal:    100,   // start eye reveal this many ms after fade begins
-    wordStart:    950,   // ms after fade starts, words begin
-    wordStagger:  210,   // ms between each word
-    btnStart:     1700,  // ms after first word starts, first button appears
-    btnStagger:   820,   // ms between each button
-    irisDelay:    700,   // ms after last button to widen iris
-    trackDelay:   2100   // ms after iris widen, start cursor tracking
+    hold:        2500,
+    eyeReveal:    120,
+    wordStart:    950,
+    wordStagger:  220,
+    btnStart:    1750,
+    btnStagger:   840,
+    irisDelay:    700,
   };
 
-  /* Phase 1 sequence kick-off */
   setTimeout(function startSequence() {
 
-    /* Step 1: Fade out intro title card */
+    /* Step 1: fade out intro */
+    intro.classList.remove('visible');
     intro.classList.add('fade-out');
 
-    /* Step 2: Reveal scene container */
+    /* Step 2: reveal scene */
     scene.setAttribute('aria-hidden', 'false');
     scene.classList.add('visible');
 
-    /* Step 3: Eye fades + scales in */
-    setTimeout(function () {
-      eyeWrap.classList.add('visible');
-    }, T.eyeReveal);
+    /* Step 3: eye scales + fades in */
+    setTimeout(function () { eyeWrap.classList.add('visible'); }, T.eyeReveal);
 
-    /* Step 4: Words blur-fade in one by one */
+    /* Step 4: words blur in one by one */
     words.forEach(function (word, i) {
-      setTimeout(function () {
-        word.classList.add('visible');
-      }, T.wordStart + i * T.wordStagger);
+      setTimeout(function () { word.classList.add('visible'); },
+        T.wordStart + i * T.wordStagger);
     });
 
-    /* Step 5 & 6: Buttons appear, eye gazes at each */
-    var seqDirs = ['down-left', 'down-center', 'down-right'];
-    var buttons = [btnShop, btnMusic, btnExamine];
+    /* Step 5 & 6: buttons appear left→right, eye gazes at each */
+    var gazeMap  = ['down-left', 'down-center', 'down-right'];
+    var btnOrder = [btnShop, btnMusic, btnExamine];
     trackingMode = 'sequence';
 
-    buttons.forEach(function (btn, i) {
+    btnOrder.forEach(function (btn, i) {
       setTimeout(function () {
         if (btn) btn.classList.add('visible');
-        eyeLookDirection(seqDirs[i]);
+        eyeLookDirection(gazeMap[i]);
       }, T.btnStart + i * T.btnStagger);
     });
 
-    /* Step 7: Iris widen after last button */
-    var lastBtnTime = T.btnStart + (buttons.length - 1) * T.btnStagger;
+    /* Step 7: iris widen after last button */
+    var lastBtnDelay = T.btnStart + (btnOrder.length - 1) * T.btnStagger;
 
     setTimeout(function () {
-      eyeLookDirection('down-right'); // hold gaze on examine source
       if (btnExamine) btnExamine.classList.add('gazing');
 
       triggerIrisWiden(function () {
-        /* After widen: ease back to forward, then start cursor tracking */
         eyeLookDirection('forward');
         if (btnExamine) btnExamine.classList.remove('gazing');
         setTimeout(function () {
@@ -207,106 +225,94 @@
           scheduleBlink();
         }, 500);
       });
-    }, lastBtnTime + T.irisDelay);
+    }, lastBtnDelay + T.irisDelay);
 
-    /* Clean up intro element */
-    setTimeout(function () {
-      intro.style.display = 'none';
-    }, 1100);
+    /* Remove intro from DOM after it's invisible */
+    setTimeout(function () { intro.style.display = 'none'; }, 1100);
 
   }, T.hold);
 
   /* ════════════════════════════════════════════════
      PHASE 2 — FLASHLIGHT / EXAMINE SOURCE
-     ════════════════════════════════════════════════ */
+  ════════════════════════════════════════════════ */
 
-  /* Flashlight beam radius (larger on touch for finger imprecision) */
-  var FL_RADIUS = isTouch ? 135 : 112;
+  var FL_RADIUS = isTouch ? 138 : 112;
   var flActive  = false;
 
-  /* RAF-throttled flashlight update */
-  var pendingX = null, pendingY = null, flRaf = false;
+  /* RAF-throttled mask update */
+  var pendingFX = null, pendingFY = null, flRaf = false;
 
   function applyFlashlight(x, y) {
     if (!llDark) return;
     var r = FL_RADIUS;
-    var g = [
-      'radial-gradient(circle ',
-      r, 'px at ',
-      x, 'px ',
-      y, 'px,',
-      'transparent 0%,',
-      'transparent 50%,',
-      'rgba(0,0,0,0.88) 72%,',
-      '#0A0806 93%)'
-    ].join('');
+    var g = 'radial-gradient(circle ' + r + 'px at ' + x + 'px ' + y + 'px,' +
+            'transparent 0%,transparent 50%,' +
+            'rgba(0,0,0,0.88) 72%,#0A0806 93%)';
     llDark.style.webkitMaskImage = g;
-    llDark.style.maskImage = g;
+    llDark.style.maskImage       = g;
   }
 
   function queueFlashlight(x, y) {
-    pendingX = x; pendingY = y;
+    pendingFX = x; pendingFY = y;
     if (!flRaf) {
       flRaf = true;
       requestAnimationFrame(function () {
-        if (pendingX !== null) applyFlashlight(pendingX, pendingY);
+        if (pendingFX !== null) applyFlashlight(pendingFX, pendingFY);
         flRaf = false;
       });
     }
   }
 
-  /* Activate flashlight mode */
+  /* Move BOTH flashlight beam AND eye from the same screen position */
+  function pointerToFlashlight(x, y) {
+    queueFlashlight(x, y);
+    updateEyeFromScreen(x, y); /* eye follows the flashlight */
+  }
+
   function enterFlashlight() {
     if (!flashlight || flActive) return;
     flActive = true;
 
-    /* Fade out tagline and buttons, but keep scene visible behind dark overlay */
-    if (taglineEl) {
-      taglineEl.style.transition = 'opacity 450ms ease';
-      taglineEl.style.opacity    = '0';
-    }
-    if (navEl) {
-      navEl.style.transition = 'opacity 450ms ease';
-      navEl.style.opacity    = '0';
-    }
+    /* Fade tagline + nav */
+    [taglineEl, navEl].forEach(function (el) {
+      if (!el) return;
+      el.style.transition = 'opacity 450ms ease';
+      el.style.opacity    = '0';
+    });
 
-    /* Start flashlight centered on the eye */
-    var rect = eyeWrap ? eyeWrap.getBoundingClientRect() : null;
-    var startX = rect ? rect.left + rect.width / 2  : window.innerWidth  / 2;
+    /* Start beam centered on eye */
+    var rect   = eyeWrap ? eyeWrap.getBoundingClientRect() : null;
+    var startX = rect ? rect.left + rect.width  / 2 : window.innerWidth  / 2;
     var startY = rect ? rect.top  + rect.height / 2 : window.innerHeight / 2;
     applyFlashlight(startX, startY);
 
-    /* Brief delay then show the dark overlay */
     setTimeout(function () {
       flashlight.setAttribute('aria-hidden', 'false');
       flashlight.classList.add('active');
     }, 280);
-
-    /* Prevent body scroll during flashlight mode */
-    document.body.style.overflow = 'hidden';
   }
 
-  /* Exit flashlight mode */
   function exitFlashlight() {
     if (!flActive) return;
     flActive = false;
-
     flashlight.classList.remove('active');
     flashlight.setAttribute('aria-hidden', 'true');
 
-    /* Restore tagline + buttons */
     setTimeout(function () {
-      if (taglineEl) { taglineEl.style.transition = 'opacity 500ms ease'; taglineEl.style.opacity = '1'; }
-      if (navEl)     { navEl.style.transition     = 'opacity 500ms ease'; navEl.style.opacity     = '1'; }
+      [taglineEl, navEl].forEach(function (el) {
+        if (!el) return;
+        el.style.transition = 'opacity 500ms ease';
+        el.style.opacity    = '1';
+      });
     }, 350);
-
-    document.body.style.overflow = '';
   }
 
-  /* ── Event listeners ────────────────────────────── */
+  /* ── Input listeners ───────────────────────────── */
 
   if (btnExamine) {
     btnExamine.addEventListener('click', enterFlashlight);
+    /* touchend fires after touchstart so we can preventDefault
+       to avoid double-firing on some mobile browsers */
     btnExamine.addEventListener('touchend', function (e) {
       e.preventDefault();
       enterFlashlight();
@@ -315,28 +321,41 @@
 
   if (llClose) {
     llClose.addEventListener('click', exitFlashlight);
+    llClose.addEventListener('touchend', function (e) {
+      e.preventDefault();
+      exitFlashlight();
+    });
   }
 
-  /* Mouse movement — feeds BOTH cursor tracking and flashlight */
+  /* Desktop mouse: flashlight beam + eye (in flashlight mode)
+     OR cursor tracking (in normal mode — handled by startCursorTracking) */
   document.addEventListener('mousemove', function (e) {
-    if (flActive) queueFlashlight(e.clientX, e.clientY);
+    if (!flActive) return;
+    pointerToFlashlight(e.clientX, e.clientY);
   }, { passive: true });
 
-  /* Touch movement — feeds flashlight on mobile */
+  /* Mobile touch START — immediately position beam + eye */
+  document.addEventListener('touchstart', function (e) {
+    if (!flActive) return;
+    var t = e.touches[0];
+    pointerToFlashlight(t.clientX, t.clientY);
+  }, { passive: true });
+
+  /* Mobile touch MOVE — drag beam + eye together */
   document.addEventListener('touchmove', function (e) {
     if (!flActive) return;
     var t = e.touches[0];
-    queueFlashlight(t.clientX, t.clientY);
+    pointerToFlashlight(t.clientX, t.clientY);
   }, { passive: true });
 
-  /* Keyboard escape to exit */
+  /* Escape key exits */
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && flActive) exitFlashlight();
   });
 
-  /* Resize: recalculate flashlight radius */
+  /* Recalculate radius on orientation change */
   window.addEventListener('resize', function () {
-    FL_RADIUS = window.matchMedia('(hover:none)').matches ? 135 : 112;
+    FL_RADIUS = window.matchMedia('(hover:none)').matches ? 138 : 112;
   }, { passive: true });
 
 })();

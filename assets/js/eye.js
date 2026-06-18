@@ -2,40 +2,47 @@
   var container = document.getElementById('zc-eye-container');
   if (!container) return;
 
-  var pupil    = document.getElementById('zc-pupil');
-  var iris     = document.getElementById('zc-iris');
-  var hiMain   = document.getElementById('zc-hl-main');
-  var hiSmall  = document.getElementById('zc-hl-small');
-  var eyeInner = document.getElementById('zc-eye-inner');
+  var pupil     = document.getElementById('zc-pupil');
+  var iris      = document.getElementById('zc-iris');
+  var irisDetail = document.getElementById('zc-iris-detail');
+  var highlight = document.getElementById('zc-highlight');
 
   if (!pupil || !iris) return;
 
-  // SVG coordinate-space eye center
   var CX = 250;
   var CY = 125;
-  var MAX_TRAVEL = 52; // max pupil offset in SVG units
+  var MAX_TRAVEL = 52;
 
   var curX = CX, curY = CY;
   var tgtX = CX, tgtY = CY;
 
   function lerp(a, b, t) { return a + (b - a) * t; }
 
+  /* Apply positions — iris and pupil are SYNCED (move as one unit) */
   function applyPosition(x, y) {
     pupil.setAttribute('cx', x);
     pupil.setAttribute('cy', y);
 
-    // Iris follows pupil but with less travel (looks natural)
-    var ix = lerp(CX, x, 0.52);
-    var iy = lerp(CY, y, 0.52);
-    iris.setAttribute('cx', ix);
-    iris.setAttribute('cy', iy);
+    /* Iris stays centered on pupil — no lerp offset */
+    iris.setAttribute('cx', x);
+    iris.setAttribute('cy', y);
 
-    // Highlights track pupil
-    if (hiMain)  { hiMain.setAttribute('cx',  x + 16); hiMain.setAttribute('cy',  y - 13); }
-    if (hiSmall) { hiSmall.setAttribute('cx', x -  9); hiSmall.setAttribute('cy', y + 11); }
+    /* Detail ring tracks iris */
+    if (irisDetail) {
+      irisDetail.setAttribute('cx', x);
+      irisDetail.setAttribute('cy', y);
+    }
+
+    /* Highlight: fixed offset from pupil, rotation center updated to its own position */
+    if (highlight) {
+      var hx = x + 16, hy = y - 13;
+      highlight.setAttribute('cx', hx);
+      highlight.setAttribute('cy', hy);
+      highlight.setAttribute('transform', 'rotate(-20 ' + hx + ' ' + hy + ')');
+    }
   }
 
-  // ── Desktop: cursor tracking ────────────────────
+  /* ── Desktop: cursor tracking ──────────────────── */
   var isTouch = ('ontouchstart' in window) || window.matchMedia('(hover: none)').matches;
 
   if (!isTouch) {
@@ -53,22 +60,19 @@
     }, { passive: true });
   }
 
-  // ── Mobile: random wander ───────────────────────
+  /* ── Mobile: random wander ─────────────────────── */
   if (isTouch) {
     var scheduleWander = function () {
       var angle  = Math.random() * Math.PI * 2;
-      // Full MAX_TRAVEL range so movement is clearly visible
       var travel = MAX_TRAVEL * (0.5 + Math.random() * 0.5);
       tgtX = CX + Math.cos(angle) * travel;
       tgtY = CY + Math.sin(angle) * travel;
-      // Shorter intervals so movement feels alive
       setTimeout(scheduleWander, 700 + Math.random() * 1200);
     };
     scheduleWander();
   }
 
-  // ── Animation loop ──────────────────────────────
-  // Higher easing on mobile = snappier, more noticeable movement
+  /* ── Animation loop ────────────────────────────── */
   var easing = isTouch ? 0.062 : 0.075;
 
   function tick() {
@@ -79,13 +83,13 @@
   }
   requestAnimationFrame(tick);
 
-  // ── Blink ───────────────────────────────────────
+  /* ── Blink ─────────────────────────────────────── */
+  var eyeInner = document.getElementById('zc-eye-inner');
   if (eyeInner) {
-    eyeInner.style.transformOrigin = CX + 'px ' + CY + 'px';
-
     var doBlink = function () {
-      eyeInner.style.transition = 'transform 65ms ease-in';
-      eyeInner.style.transform  = 'scaleY(0.04)';
+      eyeInner.style.transition    = 'transform 65ms ease-in';
+      eyeInner.style.transform     = 'scaleY(0.04)';
+      eyeInner.style.transformOrigin = CX + 'px ' + CY + 'px';
 
       setTimeout(function () {
         eyeInner.style.transition = 'transform 110ms ease-out';
@@ -100,12 +104,10 @@
     scheduleBlink();
   }
 
-  // ── Subtle scroll parallax on the eye ──────────
-  var lastScroll = 0;
+  /* ── Scroll parallax on the eye container ──────── */
   window.addEventListener('scroll', function () {
     var s = window.scrollY;
     container.style.transform = 'translate(-50%, calc(-50% + ' + (s * 0.18) + 'px))';
-    lastScroll = s;
   }, { passive: true });
 
 })();

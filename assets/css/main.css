@@ -1078,8 +1078,22 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   align-items: center;
   gap: 7px;
+  /* Start hidden — JS adds .visible after 2.2s via setTimeout (no CSS animation) */
   opacity: 0;
-  animation: fade-in-hint 0.8s ease 2.2s forwards;
+  transform: translateY(8px);
+  transition: opacity 800ms ease, transform 800ms ease;
+  pointer-events: none;
+}
+
+/* JS adds this class after 2.2s */
+.scroll-hint.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* JS adds this class after page-bottom scroll */
+.scroll-hint.gone {
+  opacity: 0;
   pointer-events: none;
 }
 

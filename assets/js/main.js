@@ -81,31 +81,43 @@
     }
   });
 
-  /* ── Scroll hint: nudge after 3s idle, hide at page bottom ── */
+  /* ── Scroll hint: fade in via class, nudge after 3s, hide at bottom ── */
   const scrollHint = document.querySelector('.scroll-hint');
   if (scrollHint) {
-    // Pulse/nudge animation if user hasn't scrolled within 3 seconds
+    /* Fade the hint in after 2.2s (class-based, no CSS animation conflict) */
+    setTimeout(function () {
+      scrollHint.classList.add('visible');
+    }, 2200);
+
+    /* Nudge pulse if user still hasn't scrolled after 3s */
     var nudgeTimer = setTimeout(function () {
-      if (window.scrollY < 10) {
+      if (window.scrollY < 10 && scrollHint.classList.contains('visible')) {
         scrollHint.classList.add('scroll-hint--nudge');
-        // Remove class after animation finishes (3 × 1.3s)
         setTimeout(function () {
           scrollHint.classList.remove('scroll-hint--nudge');
+          /* Re-ensure it's visible after nudge ends (belt-and-suspenders) */
+          scrollHint.classList.add('visible');
+          scrollHint.classList.remove('gone');
         }, 3900);
       }
     }, 3000);
 
+    /* On scroll: clear nudge, hide only at page bottom */
     window.addEventListener('scroll', function () {
-      // Clear nudge timer the moment user scrolls
       clearTimeout(nudgeTimer);
       scrollHint.classList.remove('scroll-hint--nudge');
 
-      // Hide only when user has fully reached the page bottom
-      var docEl  = document.documentElement;
+      var docEl    = document.documentElement;
       var atBottom = (window.scrollY + window.innerHeight) >= (docEl.scrollHeight - 50);
 
-      scrollHint.style.transition = 'opacity 0.6s ease';
-      scrollHint.style.opacity    = atBottom ? '0' : '';
+      if (atBottom) {
+        scrollHint.classList.remove('visible');
+        scrollHint.classList.add('gone');
+      } else {
+        /* If they scroll back up from near-bottom, restore hint */
+        scrollHint.classList.remove('gone');
+        scrollHint.classList.add('visible');
+      }
     }, { passive: true });
   }
 
