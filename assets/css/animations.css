@@ -120,6 +120,17 @@
   to   { opacity: 1; transform: translateY(0);   }
 }
 
+/* Subtle nudge pulse — fires 3× after 3s of no scroll */
+@keyframes hint-nudge {
+  0%, 100% { transform: scale(1)    translateY(0);  opacity: 1;    }
+  35%       { transform: scale(1.1) translateY(5px); opacity: 0.75; }
+  70%       { transform: scale(1.05) translateY(3px); opacity: 0.88; }
+}
+
+.scroll-hint--nudge {
+  animation: hint-nudge 1.3s ease-in-out 3;
+}
+
 /* ── Tile pulse glow on hover ─────────────────────── */
 
 @keyframes tile-glow-pulse {

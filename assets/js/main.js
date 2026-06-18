@@ -81,15 +81,31 @@
     }
   });
 
-  /* ── Scroll hint: hide after first scroll ──────── */
+  /* ── Scroll hint: nudge after 3s idle, hide at page bottom ── */
   const scrollHint = document.querySelector('.scroll-hint');
   if (scrollHint) {
-    window.addEventListener('scroll', function hideHint() {
-      if (window.scrollY > 40) {
-        scrollHint.style.transition = 'opacity 0.5s ease';
-        scrollHint.style.opacity = '0';
-        window.removeEventListener('scroll', hideHint);
+    // Pulse/nudge animation if user hasn't scrolled within 3 seconds
+    var nudgeTimer = setTimeout(function () {
+      if (window.scrollY < 10) {
+        scrollHint.classList.add('scroll-hint--nudge');
+        // Remove class after animation finishes (3 × 1.3s)
+        setTimeout(function () {
+          scrollHint.classList.remove('scroll-hint--nudge');
+        }, 3900);
       }
+    }, 3000);
+
+    window.addEventListener('scroll', function () {
+      // Clear nudge timer the moment user scrolls
+      clearTimeout(nudgeTimer);
+      scrollHint.classList.remove('scroll-hint--nudge');
+
+      // Hide only when user has fully reached the page bottom
+      var docEl  = document.documentElement;
+      var atBottom = (window.scrollY + window.innerHeight) >= (docEl.scrollHeight - 50);
+
+      scrollHint.style.transition = 'opacity 0.6s ease';
+      scrollHint.style.opacity    = atBottom ? '0' : '';
     }, { passive: true });
   }
 

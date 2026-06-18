@@ -333,20 +333,22 @@ h1, h2, h3, h4, h5, h6 {
 
 .hero-title {
   font-family: var(--font);
-  font-size: clamp(4.5rem, 17vw, 11.5rem);
+  font-size: clamp(4rem, 14.5vw, 11.5rem); /* reduced vw gives period room on mobile */
   font-weight: 700;
   line-height: 0.87;
   letter-spacing: -0.055em;
   user-select: none;
   cursor: default;
+  padding: 0 10px; /* prevents period clipping at viewport edge */
   background: linear-gradient(
     108deg,
-    var(--fg) 22%,
-    var(--accent) 44%,
+    var(--fg) 10%,
+    var(--accent) 40%,
     var(--accent-cool) 52%,
-    var(--fg) 68%
+    var(--fg) 72%,
+    var(--fg) 100%
   );
-  background-size: 240% auto;
+  background-size: 260% auto;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -540,7 +542,7 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 1;
 }
 
-.ll-hero .hero-title { font-size: clamp(5rem, 20vw, 13rem); }
+.ll-hero .hero-title { font-size: clamp(4.5rem, 17vw, 13rem); }
 
 .ll-cta {
   display: flex;
@@ -1032,6 +1034,20 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+/* ── Homepage: logo-only topbar ─────────────────── */
+
+.topbar--home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-template-columns: unset; /* override grid */
+}
+
+.topbar--home .topnav,
+.topbar--home .topbar-right {
+  display: none;
 }
 
 /* ── Active nav link ─────────────────────────────── */
