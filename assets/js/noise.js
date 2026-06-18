@@ -6,10 +6,10 @@
 (function () {
   var isMobile = ('ontouchstart' in window) || window.matchMedia('(max-width: 768px)').matches;
 
-  var TILE  = isMobile ? 180 : 256;  // noise tile size in px
-  var FPS   = isMobile ?  8  : 18;   // grain animation speed
-  var OPAC  = isMobile ? 0.05 : 0.072; // overall opacity
-  var TILES = isMobile ?  3  : 8;    // unique tiles to cycle through
+  var TILE  = isMobile ? 200 : 256;  // noise tile size in px
+  var FPS   = isMobile ? 12  : 20;   // grain animation speed
+  var OPAC  = isMobile ? 0.09 : 0.11; // opacity — more visible
+  var TILES = isMobile ?  4  : 8;    // unique tiles to cycle through
 
   /* Generate a single grayscale noise tile */
   function makeTile() {

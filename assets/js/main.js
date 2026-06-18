@@ -53,6 +53,34 @@
     });
   }
 
+  /* ── Word-by-word reveal ────────────────────────── */
+  document.querySelectorAll('[data-word-reveal]').forEach(function (el) {
+    // Split into individual word spans
+    var words = el.textContent.trim().split(/\s+/);
+    el.innerHTML = words.map(function (w, i) {
+      return '<span class="word" style="--wi:' + i + '">' + w + '</span>';
+    }).join(' ');
+
+    // Trigger when element enters viewport
+    if ('IntersectionObserver' in window) {
+      var wordObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.querySelectorAll('.word').forEach(function (span) {
+              span.classList.add('visible');
+            });
+            wordObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+      wordObs.observe(el);
+    } else {
+      el.querySelectorAll('.word').forEach(function (span) {
+        span.classList.add('visible');
+      });
+    }
+  });
+
   /* ── Scroll hint: hide after first scroll ──────── */
   const scrollHint = document.querySelector('.scroll-hint');
   if (scrollHint) {

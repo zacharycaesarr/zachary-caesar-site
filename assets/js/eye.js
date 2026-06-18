@@ -13,7 +13,7 @@
   // SVG coordinate-space eye center
   var CX = 250;
   var CY = 125;
-  var MAX_TRAVEL = 44; // max pupil offset in SVG units
+  var MAX_TRAVEL = 52; // max pupil offset in SVG units
 
   var curX = CX, curY = CY;
   var tgtX = CX, tgtY = CY;
@@ -57,16 +57,19 @@
   if (isTouch) {
     var scheduleWander = function () {
       var angle  = Math.random() * Math.PI * 2;
-      var travel = Math.random() * MAX_TRAVEL * 0.8;
+      // Full MAX_TRAVEL range so movement is clearly visible
+      var travel = MAX_TRAVEL * (0.5 + Math.random() * 0.5);
       tgtX = CX + Math.cos(angle) * travel;
       tgtY = CY + Math.sin(angle) * travel;
-      setTimeout(scheduleWander, 1800 + Math.random() * 2400);
+      // Shorter intervals so movement feels alive
+      setTimeout(scheduleWander, 700 + Math.random() * 1200);
     };
     scheduleWander();
   }
 
   // ── Animation loop ──────────────────────────────
-  var easing = isTouch ? 0.038 : 0.075;
+  // Higher easing on mobile = snappier, more noticeable movement
+  var easing = isTouch ? 0.062 : 0.075;
 
   function tick() {
     curX = lerp(curX, tgtX, easing);

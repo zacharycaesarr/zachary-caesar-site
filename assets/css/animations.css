@@ -6,27 +6,44 @@
 
 [data-reveal] {
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 640ms cubic-bezier(0.25,1,0.4,1),
-              transform 640ms cubic-bezier(0.25,1,0.4,1);
+  transform: translateY(22px);
+  transition: opacity 900ms cubic-bezier(0.25,1,0.4,1),
+              transform 900ms cubic-bezier(0.25,1,0.4,1);
 }
 
-[data-delay="1"] { transition-delay: 80ms;  }
-[data-delay="2"] { transition-delay: 160ms; }
-[data-delay="3"] { transition-delay: 240ms; }
-[data-delay="4"] { transition-delay: 320ms; }
+/* Stagger delays — wider gaps so each element is clearly noticed */
+[data-delay="1"] { transition-delay: 200ms; }
+[data-delay="2"] { transition-delay: 400ms; }
+[data-delay="3"] { transition-delay: 600ms; }
+[data-delay="4"] { transition-delay: 800ms; }
 
 [data-reveal].visible {
   opacity: 1;
   transform: none;
 }
 
-/* ── Eye breathe ────────────────────────────────── */
+/* ── Word-by-word reveal ─────────────────────────── */
+
+.word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 500ms cubic-bezier(0.25,1,0.4,1),
+              transform 500ms cubic-bezier(0.25,1,0.4,1);
+  transition-delay: calc(var(--wi, 0) * 55ms + 120ms);
+}
+
+.word.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Eye breathe ─────────────────────────────────── */
 
 @keyframes eye-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.22; }
-  40%       { transform: scale(1.025); opacity: 0.26; }
-  70%       { transform: scale(0.985); opacity: 0.19; }
+  0%, 100% { transform: scale(1);     opacity: 0.22; }
+  40%       { transform: scale(1.03); opacity: 0.27; }
+  70%       { transform: scale(0.98); opacity: 0.18; }
 }
 
 /* ── Marquee ─────────────────────────────────────── */
@@ -39,26 +56,26 @@
 /* ── Background ambient orbs ─────────────────────── */
 
 @keyframes drift-gold {
-  0%   { transform: translate(0,   0)   scale(1);    }
-  25%  { transform: translate(120px, 90px) scale(1.12); }
+  0%   { transform: translate(0,     0)     scale(1);    }
+  25%  { transform: translate(120px, 90px)  scale(1.12); }
   55%  { transform: translate(-70px, 150px) scale(0.95); }
-  80%  { transform: translate(50px,  -40px) scale(1.05); }
-  100% { transform: translate(0,   0)   scale(1);    }
+  80%  { transform: translate(50px, -40px)  scale(1.05); }
+  100% { transform: translate(0,     0)     scale(1);    }
 }
 
 @keyframes drift-blue {
-  0%   { transform: translate(0,   0)   scale(1);    }
-  30%  { transform: translate(-90px, 80px) scale(1.08); }
-  60%  { transform: translate(70px, -110px) scale(1.15); }
-  85%  { transform: translate(-40px, 60px) scale(0.92); }
-  100% { transform: translate(0,   0)   scale(1);    }
+  0%   { transform: translate(0,     0)      scale(1);    }
+  30%  { transform: translate(-90px, 80px)   scale(1.08); }
+  60%  { transform: translate(70px, -110px)  scale(1.15); }
+  85%  { transform: translate(-40px, 60px)   scale(0.92); }
+  100% { transform: translate(0,     0)      scale(1);    }
 }
 
 @keyframes drift-red {
-  0%   { transform: translate(0,   0)   scale(1);    }
+  0%   { transform: translate(0,   0)    scale(1);    }
   45%  { transform: translate(90px, -65px) scale(1.10); }
   75%  { transform: translate(-50px, 30px) scale(0.94); }
-  100% { transform: translate(0,   0)   scale(1);    }
+  100% { transform: translate(0,   0)    scale(1);    }
 }
 
 @keyframes drift-pale {
@@ -70,11 +87,11 @@
 /* ── Light ray sweep ─────────────────────────────── */
 
 @keyframes ray-sweep {
-  0%   { transform: translateX(-8%) skewX(-6deg); opacity: 0;    }
+  0%   { transform: translateX(-8%) skewX(-6deg); opacity: 0;   }
   15%  { opacity: 0.8; }
-  50%  { transform: translateX(8%)  skewX(-6deg); opacity: 1;    }
+  50%  { transform: translateX(8%)  skewX(-6deg); opacity: 1;   }
   85%  { opacity: 0.8; }
-  100% { transform: translateX(-8%) skewX(-6deg); opacity: 0;    }
+  100% { transform: translateX(-8%) skewX(-6deg); opacity: 0;   }
 }
 
 /* ── Shimmer (hero title) ────────────────────────── */
@@ -88,18 +105,6 @@
   animation: shimmer 7s linear infinite;
 }
 
-/* ── Floating / pulse (generic utilities) ────────── */
-
-@keyframes floaty {
-  0%, 100% { transform: translateY(0);    }
-  50%       { transform: translateY(-6px); }
-}
-
-@keyframes pulse-border {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(192,144,64,0.3); }
-  50%       { box-shadow: 0 0 0 8px rgba(192,144,64,0); }
-}
-
 /* ── Scroll hint ─────────────────────────────────── */
 
 @keyframes scroll-dot {
@@ -109,11 +114,91 @@
   100% { top: 100%; opacity: 0; }
 }
 
+/* No translateX here — scroll-hint is centered by hero flexbox */
 @keyframes fade-in-hint {
-  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
 }
+
+/* ── Tile pulse glow on hover ─────────────────────── */
+
+@keyframes tile-glow-pulse {
+  0%, 100% { box-shadow: 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.65); }
+  50%       { box-shadow: 0 12px 44px rgba(192,144,64,0.22), inset 0 1px 0 rgba(255,255,255,0.75); }
+}
+
+/* ── Floating / pulse (generic utilities) ────────── */
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(192,144,64,0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(192,144,64,0);   }
+}
+
+/* ── Nav link slide-up on load ───────────────────── */
+
+@keyframes nav-drop-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.topnav a, .cart-btn {
+  animation: nav-drop-in 500ms ease both;
+}
+
+.topnav a:nth-child(1) { animation-delay:  80ms; }
+.topnav a:nth-child(2) { animation-delay: 160ms; }
+.topnav a:nth-child(3) { animation-delay: 240ms; }
+.topnav a:nth-child(4) { animation-delay: 320ms; }
+.topnav a:nth-child(5) { animation-delay: 400ms; }
+.cart-btn              { animation-delay: 480ms; }
+
+/* ── Card stagger (nth-child-based) ─────────────── */
+
+.album-card:nth-child(1)  { transition-delay:  50ms; }
+.album-card:nth-child(2)  { transition-delay: 100ms; }
+.album-card:nth-child(3)  { transition-delay: 150ms; }
+.album-card:nth-child(4)  { transition-delay: 200ms; }
+.album-card:nth-child(5)  { transition-delay: 250ms; }
+.album-card:nth-child(6)  { transition-delay: 300ms; }
+.album-card:nth-child(7)  { transition-delay: 350ms; }
+.album-card:nth-child(8)  { transition-delay: 400ms; }
+.album-card:nth-child(9)  { transition-delay: 450ms; }
+.album-card:nth-child(10) { transition-delay: 500ms; }
+.album-card:nth-child(11) { transition-delay: 550ms; }
+
+.product-card:nth-child(1)  { transition-delay:  40ms; }
+.product-card:nth-child(2)  { transition-delay:  80ms; }
+.product-card:nth-child(3)  { transition-delay: 120ms; }
+.product-card:nth-child(4)  { transition-delay: 160ms; }
+.product-card:nth-child(5)  { transition-delay: 200ms; }
+.product-card:nth-child(6)  { transition-delay: 240ms; }
+.product-card:nth-child(7)  { transition-delay: 280ms; }
+.product-card:nth-child(8)  { transition-delay: 320ms; }
+.product-card:nth-child(9)  { transition-delay: 360ms; }
+.product-card:nth-child(10) { transition-delay: 400ms; }
+.product-card:nth-child(11) { transition-delay: 440ms; }
+.product-card:nth-child(12) { transition-delay: 480ms; }
+.product-card:nth-child(13) { transition-delay: 520ms; }
+.product-card:nth-child(14) { transition-delay: 560ms; }
+.product-card:nth-child(15) { transition-delay: 600ms; }
+.product-card:nth-child(16) { transition-delay: 640ms; }
 
 /* ── Tilt interaction reset ──────────────────────── */
 
 [data-tilt] { transform-style: preserve-3d; }
+
+/* ── Respect OS reduce-motion preference ─────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:     0.001ms !important;
+    animation-iteration-count: 1   !important;
+    transition-duration:    0.001ms !important;
+  }
+  .orb, .ray { opacity: 0.2; animation: none; }
+}
