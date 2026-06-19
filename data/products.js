@@ -2,26 +2,37 @@
    PRODUCTS DATA — ZACHARY CAESAR SHOP
    ================================================================
 
-   HOW TO ADD A PRODUCT:
-   1. Copy one of the blocks below (from { to the closing },)
-   2. Paste it at the top of the list (newest products show first)
-   3. Fill in your details
-   4. Save the file
+   HOW TO ADD A PRODUCT (copy this template):
+   ──────────────────────────────────────────
+   {
+     id:           "unique-id",           // no spaces, lowercase
+     name:         "PRODUCT NAME",
+     price:        "$35",                // display price
+     priceAmount:  35.00,                // number for cart math
+     ribbon:       "HOT",                // "HOT" | "NEW" | "LIMITED" | ""
+     image:        null,                 // regular photo (optional)
+     mockupImage:  null,                 // transparent PNG mockup (recommended)
+     variantId:    "",                   // Shopify variant GID (see below)
+     sizes:        ["S","M","L","XL"],   // shown in quick view
+     variants:     {},                   // optional: { "M": "gid://shopify/ProductVariant/123" }
+     description:  ""
+   },
 
-   HOW TO REMOVE A PRODUCT:
-   Delete the entire block from { to },
+   PRODUCT IMAGES (transparent PNG mockups):
+   ───────────────────────────────────────
+   1. Export your Tapstitch mockup as PNG with transparent background
+   2. Save to: assets/img/products/your-product.png
+   3. Set mockupImage: "assets/img/products/your-product.png"
+   The site adds a themed gradient background + drop shadow automatically.
 
-   HOW TO CONNECT SHOPIFY:
-   - Set "shopifyUrl" to the full product URL from your Shopify store
-     e.g. "https://your-store.myshopify.com/products/light-leaks-tee"
-   - Once connected, the "ADD TO CART" button will go straight to Shopify
+   SHOPIFY VARIANT ID:
+   ───────────────────
+   In Shopify Admin → Products → click product → click a variant
+   The URL contains the variant number. For the API, use the full GID:
+     "gid://shopify/ProductVariant/12345678901234"
+   Paste that into variantId (or variants object for size-specific IDs).
 
-   RIBBON OPTIONS: "HOT" | "NEW" | "LIMITED" | "" (blank = no ribbon)
-
-   IMAGE: Put your product image in assets/img/products/
-   Then set "image" to e.g. "assets/img/products/ll-tee-front.jpg"
-   Leave as null if you don't have an image yet.
-
+   SHOP CONFIG: data/shop-config.js (fill in once, then set enabled: true)
    ================================================================ */
 
 window.ZC_PRODUCTS = [
@@ -150,9 +161,14 @@ window.ZC_PRODUCTS = [
     id:          "ll-tee",
     name:        "LIGHT LEAKS TEE",
     price:       "$XX",
+    priceAmount: 0,
     ribbon:      "HOT",
     image:       null,
-    shopifyUrl:  "#"
+    mockupImage: null,
+    variantId:   "",
+    sizes:       ["S", "M", "L", "XL", "XXL"],
+    variants:    {},
+    description: ""
   }
 
 ];

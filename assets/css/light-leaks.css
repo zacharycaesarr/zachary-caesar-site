@@ -270,31 +270,21 @@
   pointer-events: auto;
 }
 
-/* The dark veil — mask-image punched by JS to make the flashlight beam */
+/* The dark veil — solid black; text sits above with its own beam mask */
 #ll-dark {
   position: absolute;
   inset: 0;
   background: #0A0806;
-  /* mask-image is set inline by light-leaks.js for cross-browser support */
-  will-change: mask-image, -webkit-mask-image;
+  z-index: 1;
 }
 
-/* ── Hidden reveal text layer ─────────────────────
-   Sits between ll-dark (behind it) and ll-dark's mask.
-   Revealed text is visible wherever the mask is transparent.
-   ─────────────────────────────────────────────── */
-
+/* Hidden text — masked so it only appears inside the flashlight beam */
 #ll-hidden-layer {
   position: absolute;
   inset: 0;
+  z-index: 2;
   pointer-events: none;
-  /* Sits BEHIND ll-dark via z-index so only visible through the mask hole */
-  z-index: 0;
-}
-
-/* ll-dark needs to be above the hidden layer */
-#ll-dark {
-  z-index: 1;
+  will-change: mask-image, -webkit-mask-image;
 }
 
 .ll-rt {
@@ -304,21 +294,22 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(240, 232, 218, 0.88);
+  color: #F0E8DA;
   transform: rotate(calc(var(--rot, 0) * 1deg));
   white-space: nowrap;
-  /* Soft glow — no chromatic aberration */
-  text-shadow: 0 0 18px rgba(240, 232, 218, 0.35);
-  mix-blend-mode: screen;
+  text-shadow: 0 0 22px rgba(240, 232, 218, 0.55);
   user-select: none;
-  /* Staggered pulse using CSS custom property --pi set inline per element */
   animation: ll-text-pulse 2.8s ease-in-out infinite;
   animation-delay: calc(var(--pi, 0) * 0.65s);
 }
 
-/* Track items will have data-track; show pointer so user knows they're tappable */
+/* Track items — tappable once music URLs are wired in examine-tracks.js */
 .ll-rt[data-track] {
+  pointer-events: auto;
   cursor: pointer;
+  transition: color 180ms, text-shadow 180ms;
+  text-decoration: none;
+  color: #F0E8DA;
 }
 .ll-rt[data-track]:hover,
 .ll-rt[data-track]:focus {

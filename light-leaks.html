@@ -92,9 +92,9 @@
         <!-- Pupil (moves with cursor/touch) -->
         <circle id="ll-pupil" cx="250" cy="125" r="27"
                 fill="url(#ll-pupil-grad)"/>
-        <!-- Iris detail ring -->
-        <circle cx="250" cy="125" r="52"
-                fill="none" stroke="rgba(192,144,64,0.30)" stroke-width="1.5"/>
+        <!-- Iris detail ring (synced with pupil via JS — same as homepage zc-iris-detail) -->
+        <circle id="ll-iris-detail" cx="250" cy="125" r="52"
+                fill="none" stroke="rgba(192,144,64,0.35)" stroke-width="1.5"/>
         <!-- Corneal highlight (tracks pupil) -->
         <ellipse id="ll-highlight" cx="234" cy="112" rx="10" ry="7"
                  fill="rgba(255,252,242,0.82)" transform="rotate(-18 234 112)"/>
@@ -146,22 +146,8 @@
     <!-- Black veil — CSS mask-image punched out by JS to create the flashlight beam -->
     <div id="ll-dark"></div>
 
-    <!-- Hidden texts revealed by the flashlight beam -->
-    <!-- These will be replaced with real track titles later -->
-    <div id="ll-hidden-layer" aria-hidden="true">
-      <!-- data-track items will become tappable links once real track URLs exist -->
-      <span class="ll-rt" data-track="1"  style="top:18%;left:12%;--rot:-4;--pi:0">LIGHT LEAKS</span>
-      <span class="ll-rt" data-track="2"  style="top:34%;left:58%;--rot:3;--pi:1">GOOD NOVEMBER</span>
-      <span class="ll-rt" data-track="3"  style="top:54%;left:24%;--rot:-2;--pi:2">IF NOT NOW</span>
-      <span class="ll-rt" data-track="4"  style="top:70%;left:62%;--rot:5;--pi:3">CALLIOPE</span>
-      <!-- non-clickable decorative items (no data-track) -->
-      <span class="ll-rt" style="top:11%;left:50%;--rot:0;--pi:4;font-size:clamp(1rem,4vw,2.2rem)">— LL —</span>
-      <span class="ll-rt" style="top:80%;left:16%;--rot:-1;--pi:5;letter-spacing:0.3em">WATCH THE LIGHT BLEED</span>
-      <span class="ll-rt" style="top:42%;left:4%;--rot:90;--pi:6;writing-mode:vertical-lr;letter-spacing:0.14em">ZACHARY CAESAR</span>
-      <span class="ll-rt" style="top:22%;left:80%;--rot:-3;--pi:7">2026</span>
-      <span class="ll-rt" style="top:62%;left:40%;--rot:2;--pi:8;font-size:0.72em">light leaks.</span>
-      <span class="ll-rt" style="top:88%;left:50%;--rot:0;--pi:9;letter-spacing:0.4em">CROOKED SMILE</span>
-    </div>
+    <!-- Hidden texts revealed by the flashlight beam (built from data/examine-tracks.js) -->
+    <div id="ll-hidden-layer" aria-hidden="true"></div>
 
     <!-- Close / reset button -->
     <button id="ll-close" type="button" aria-label="Exit examine mode" title="Exit">×</button>
@@ -170,6 +156,7 @@
 
   <script src="assets/js/main.js"></script>
   <script src="assets/js/noise.js"></script>
+  <script src="data/examine-tracks.js"></script>
   <script src="assets/js/light-leaks.js"></script>
 </body>
 </html>

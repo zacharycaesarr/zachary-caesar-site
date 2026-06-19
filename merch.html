@@ -7,6 +7,7 @@
     <title>shop. — zachary caesar.</title>
     <link rel="stylesheet" href="assets/css/main.css" />
     <link rel="stylesheet" href="assets/css/animations.css" />
+    <link rel="stylesheet" href="assets/css/shop.css" />
   </head>
   <body>
 
@@ -76,16 +77,38 @@
       <span class="footer-text">Crooked Smile Records</span>
     </footer>
 
-    <!--
-      SHOPIFY BUY BUTTON JS
-      When ready, paste your Shopify Buy Button embed script here.
-      Get it from: Shopify Admin → Sales Channels → Buy Button
-    -->
+    <!-- Cart overlay + drawer -->
+    <div id="zc-cart-overlay" aria-hidden="true"></div>
+    <aside id="zc-cart-drawer" aria-hidden="true" aria-label="Shopping cart">
+      <div class="cart-drawer-head">
+        <span class="cart-drawer-title">YOUR CART</span>
+        <button type="button" id="zc-cart-close" aria-label="Close cart">×</button>
+      </div>
+      <p id="zc-cart-demo-banner">
+        DEMO MODE — cart works locally. Connect Shopify in data/shop-config.js to accept payments.
+      </p>
+      <div class="cart-drawer-body">
+        <div id="zc-cart-empty">
+          <span>YOUR CART IS EMPTY</span>
+        </div>
+        <div id="zc-cart-items"></div>
+      </div>
+      <div id="zc-cart-footer" hidden>
+        <div class="cart-total-row">
+          <span class="cart-total-label">SUBTOTAL</span>
+          <span id="zc-cart-total">$0.00</span>
+        </div>
+        <button type="button" id="zc-cart-checkout">CHECKOUT</button>
+      </div>
+    </aside>
 
+    <script src="data/shop-config.js"></script>
     <script src="data/products.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/scroll-effects.js"></script>
     <script src="assets/js/gesture.js"></script>
+    <script src="assets/js/shopify-client.js"></script>
+    <script src="assets/js/cart.js"></script>
     <script src="assets/js/shop.js"></script>
     <script src="assets/js/noise.js"></script>
   </body>

@@ -19,14 +19,46 @@
   var btnExamine  = document.getElementById('ll-btn-examine');
   var flashlight  = document.getElementById('ll-flashlight');
   var llDark      = document.getElementById('ll-dark');
+  var hiddenLayer = document.getElementById('ll-hidden-layer');
   var llClose     = document.getElementById('ll-close');
   var irisEl      = document.getElementById('ll-iris');
   var pupilEl     = document.getElementById('ll-pupil');
   var highlightEl = document.getElementById('ll-highlight');
-  var irisRingEl  = document.getElementById('ll-iris-ring');
+  var irisDetailEl = document.getElementById('ll-iris-detail');
   var words       = taglineEl ? taglineEl.querySelectorAll('.ll-word') : [];
 
   if (!intro || !scene || !eyeWrap) return;
+
+  /* ── Build flashlight text from data/examine-tracks.js ── */
+  function buildExamineLayer() {
+    if (!hiddenLayer) return;
+    var items = window.ZC_EXAMINE_ITEMS;
+    if (!items || !items.length) return;
+
+    hiddenLayer.innerHTML = items.map(function (item, i) {
+      var style = 'top:' + item.top + ';left:' + item.left + ';--rot:' + (item.rot || 0) + ';--pi:' + i;
+      if (item.spacing) style += ';letter-spacing:' + item.spacing;
+      if (item.size === 'large') style += ';font-size:clamp(1rem,4vw,2.2rem)';
+      if (item.small) style += ';font-size:0.72em';
+      if (item.vertical) style += ';writing-mode:vertical-lr;letter-spacing:0.14em';
+
+      if (item.type === 'track') {
+        return '<a class="ll-rt" data-track="' + item.id + '" href="' + (item.musicUrl || '#') + '" style="' + style + '">' + item.title + '</a>';
+      }
+      return '<span class="ll-rt" style="' + style + '">' + item.title + '</span>';
+    }).join('');
+  }
+  buildExamineLayer();
+
+  /* Prevent track links from navigating until musicUrl is set */
+  if (hiddenLayer) {
+    hiddenLayer.addEventListener('click', function (e) {
+      var link = e.target.closest('a.ll-rt');
+      if (link && (link.getAttribute('href') === '#' || !link.getAttribute('href'))) {
+        e.preventDefault();
+      }
+    });
+  }
 
   /* ── Device detection ──────────────────────────── */
   var isTouch = ('ontouchstart' in window) || window.matchMedia('(hover:none)').matches;
@@ -55,10 +87,10 @@
     irisEl.setAttribute('cx', x);
     irisEl.setAttribute('cy', y);
 
-    /* Detail ring tracks iris */
-    if (irisRingEl) {
-      irisRingEl.setAttribute('cx', x);
-      irisRingEl.setAttribute('cy', y);
+    /* Detail ring tracks iris (orange circle — synced with pupil) */
+    if (irisDetailEl) {
+      irisDetailEl.setAttribute('cx', x);
+      irisDetailEl.setAttribute('cy', y);
     }
 
     /* Highlight: fixed offset from pupil center + keep rotation on itself */
@@ -243,13 +275,14 @@
   var pendingFX = null, pendingFY = null, flRaf = false;
 
   function applyFlashlight(x, y) {
-    if (!llDark) return;
     var r = FL_RADIUS;
-    var g = 'radial-gradient(circle ' + r + 'px at ' + x + 'px ' + y + 'px,' +
-            'transparent 0%,transparent 50%,' +
-            'rgba(0,0,0,0.88) 72%,#0A0806 93%)';
-    llDark.style.webkitMaskImage = g;
-    llDark.style.maskImage       = g;
+    /* Text layer: opaque in beam, transparent outside */
+    var textMask = 'radial-gradient(circle ' + r + 'px at ' + x + 'px ' + y + 'px,' +
+                   '#000 0%,#000 48%,transparent 70%,transparent 100%)';
+    if (hiddenLayer) {
+      hiddenLayer.style.webkitMaskImage = textMask;
+      hiddenLayer.style.maskImage       = textMask;
+    }
   }
 
   function queueFlashlight(x, y) {
