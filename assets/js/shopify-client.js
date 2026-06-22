@@ -15,6 +15,7 @@
     'title',
     'description',
     'featuredImage { url altText }',
+    'images(first: 20) { edges { node { url altText } } }',
     'priceRange { minVariantPrice { amount currencyCode } maxVariantPrice { amount currencyCode } }',
     'options { name values }',
     'variants(first: 100) {',
@@ -85,16 +86,21 @@
     });
 
     var minPrice = node.priceRange.minVariantPrice;
+    var images = (node.images && node.images.edges || []).map(function (e) {
+      return e.node.url;
+    });
 
     return {
       id: node.handle,
       handle: node.handle,
       gid: node.id,
       name: overrides.displayName || node.title,
-      description: node.description || '',
+      description: overrides.description || node.description || '',
       ribbon: overrides.ribbon || '',
       mockupImage: overrides.mockupImage || null,
+      useBlend: !overrides.mockupImage,
       image: node.featuredImage ? node.featuredImage.url : null,
+      images: images,
       price: formatMoney(minPrice.amount, minPrice.currencyCode),
       priceAmount: parseFloat(minPrice.amount),
       options: node.options || [],

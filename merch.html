@@ -75,7 +75,7 @@
       <p id="zc-cart-demo-banner">
         DEMO MODE — cart works locally. Connect Shopify in data/shop-config.js to accept payments.
       </p>
-      <div class="cart-drawer-body">
+      <div class="cart-drawer-body" id="zc-cart-body">
         <div id="zc-cart-empty">
           <span>YOUR CART IS EMPTY</span>
         </div>
@@ -90,6 +90,28 @@
       </div>
     </aside>
 
+    <!-- Product detail modal -->
+    <div id="zc-pd-overlay" aria-hidden="true"></div>
+    <div id="zc-product-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pd-title">
+      <button type="button" id="zc-pd-close" aria-label="Close product view">×</button>
+      <div class="pd-layout">
+        <div class="pd-gallery">
+          <div class="pd-main-wrap">
+            <div class="pd-img-bg" aria-hidden="true"></div>
+            <img id="pd-main-img" class="pd-main-img" src="" alt="" />
+          </div>
+          <div class="pd-thumbs" id="pd-thumbs"></div>
+        </div>
+        <div class="pd-info">
+          <h2 class="pd-title" id="pd-title"></h2>
+          <p class="pd-price" id="pd-price"></p>
+          <p class="pd-desc" id="pd-desc"></p>
+          <div class="pd-options" id="pd-options"></div>
+          <button type="button" class="btn btn-fill btn-add-cart" id="pd-add-cart">ADD TO CART</button>
+        </div>
+      </div>
+    </div>
+
     <script src="data/shop-config.js"></script>
     <script src="data/product-overrides.js"></script>
     <script src="assets/js/main.js"></script>
@@ -98,6 +120,7 @@
     <script src="assets/js/shopify-client.js"></script>
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/shop.js"></script>
+    <script src="assets/js/product-modal.js"></script>
     <script src="assets/js/noise.js"></script>
   </body>
 </html>

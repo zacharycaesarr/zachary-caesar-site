@@ -24,6 +24,19 @@
     tan: '#c9a66b'
   };
 
+  var SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', 'XXL'];
+
+  function sortSizes(values) {
+    return values.slice().sort(function (a, b) {
+      var ia = SIZE_ORDER.indexOf(a.toUpperCase());
+      var ib = SIZE_ORDER.indexOf(b.toUpperCase());
+      if (ia === -1) ia = 999;
+      if (ib === -1) ib = 999;
+      if (ia !== ib) return ia - ib;
+      return a.localeCompare(b);
+    });
+  }
+
   function esc(str) {
     var d = document.createElement('div');
     d.textContent = str;
@@ -47,9 +60,9 @@
   function getDefaultSelections(product) {
     var sel = {};
     (product.options || []).forEach(function (opt) {
-      if (opt.values && opt.values.length) {
-        sel[opt.name] = opt.values[0];
-      }
+      if (!opt.values || !opt.values.length) return;
+      var isSize = opt.name.toLowerCase().indexOf('size') !== -1;
+      sel[opt.name] = isSize ? sortSizes(opt.values)[0] : opt.values[0];
     });
     return sel;
   }
@@ -87,8 +100,9 @@
     }
 
     if (imgUrl) {
+      var blendClass = product.useBlend ? ' product-img--blend' : '';
       return [
-        '<div class="product-img">',
+        '<div class="product-img' + blendClass + '">',
         '  <img class="product-card-img" src="' + esc(imgUrl) + '" alt="' + esc(product.name) + '" loading="lazy" />',
         '  ' + ribbon,
         '</div>'
@@ -128,7 +142,7 @@
       } else {
         html.push('<div class="qv-option-group"><span class="qv-option-label">' + esc(name.toUpperCase()) + '</span>');
         html.push('<div class="qv-sizes" data-option="' + esc(name) + '">');
-        opt.values.forEach(function (val) {
+        sortSizes(opt.values).forEach(function (val) {
           var sel = selections[name] === val ? ' selected' : '';
           var testSel = Object.assign({}, selections, {});
           testSel[name] = val;
@@ -292,12 +306,16 @@
         return;
       }
 
-      if (window.matchMedia('(hover: none)').matches) {
-        var card = e.target.closest('.product-card');
-        if (!card || e.target.closest('.qv-actions, .qv-options, .btn-add-cart')) return;
-        var wasOpen = card.classList.contains('open');
-        grid.querySelectorAll('.product-card.open').forEach(function (c) { c.classList.remove('open'); });
-        if (!wasOpen) card.classList.add('open');
+      /* Open product detail modal on card tap / click */
+      var card = e.target.closest('.product-card');
+      if (card && !e.target.closest('.qv-color, .qv-size, .btn-add-cart')) {
+        if (window.ZC_PRODUCT_MODAL) {
+          window.ZC_PRODUCT_MODAL.open(
+            card.getAttribute('data-product-handle'),
+            getCardSelections(card)
+          );
+        }
+        e.preventDefault();
       }
     });
   }

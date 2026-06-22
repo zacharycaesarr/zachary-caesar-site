@@ -16,6 +16,7 @@
   var closeBtn    = document.getElementById('zc-cart-close');
   var itemsEl     = document.getElementById('zc-cart-items');
   var emptyEl     = document.getElementById('zc-cart-empty');
+  var cartBody    = document.getElementById('zc-cart-body');
   var footerEl    = document.getElementById('zc-cart-footer');
   var totalEl     = document.getElementById('zc-cart-total');
   var checkoutBtn = document.getElementById('zc-cart-checkout');
@@ -73,13 +74,13 @@
 
     if (!hasItems) {
       itemsEl.innerHTML = '';
-      emptyEl.hidden = false;
+      emptyEl.classList.add('is-visible');
       footerEl.hidden = true;
       updateCount();
       return;
     }
 
-    emptyEl.hidden = true;
+    emptyEl.classList.remove('is-visible');
     footerEl.hidden = false;
     totalEl.textContent = formatMoney(subtotal());
 
@@ -271,7 +272,10 @@
   if (checkoutBtn) checkoutBtn.addEventListener('click', checkout);
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('zc-product-modal') &&
+        document.getElementById('zc-product-modal').classList.contains('open')) return;
+    if (drawer.classList.contains('open')) closeDrawer();
   });
 
   itemsEl.addEventListener('click', function (e) {
