@@ -143,11 +143,17 @@
        ════════════════════════════════════════ -->
   <div id="ll-flashlight" aria-hidden="true" role="presentation">
 
-    <!-- Black veil — CSS mask-image punched out by JS to create the flashlight beam -->
-    <div id="ll-dark"></div>
+    <!-- Solid base blocks the scene; beam punches through ll-dark on top -->
+    <div id="ll-fl-base" aria-hidden="true"></div>
 
-    <!-- Hidden texts revealed by the flashlight beam (built from data/examine-tracks.js) -->
+    <!-- Hidden track text (revealed inside the beam) -->
     <div id="ll-hidden-layer" aria-hidden="true"></div>
+
+    <!-- Warm god-ray glow — follows cursor -->
+    <div id="ll-beam" aria-hidden="true"></div>
+
+    <!-- Dark veil — mask punched out by JS to create the flashlight hole -->
+    <div id="ll-dark"></div>
 
     <!-- Close / reset button -->
     <button id="ll-close" type="button" aria-label="Exit examine mode" title="Exit">×</button>

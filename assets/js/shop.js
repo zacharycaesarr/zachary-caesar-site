@@ -1,148 +1,333 @@
 /* ================================================================
-   shop.js — renders product cards + wires add-to-cart
-   Product data: data/products.js
-   Cart: assets/js/cart.js
+   shop.js — fetches products + variants live from Shopify
+   Optional tweaks: data/product-overrides.js
    ================================================================ */
 
 (function () {
+  'use strict';
+
   var grid = document.getElementById('zc-product-grid');
   if (!grid) return;
 
-  var products = window.ZC_PRODUCTS;
-  if (!products || !products.length) {
-    grid.innerHTML = '<p style="text-align:center;color:var(--muted);padding:40px">No products yet.</p>';
-    return;
+  window.ZC_PRODUCT_CACHE = {};
+
+  var COLOR_MAP = {
+    black: '#1a1a1a',
+    white: '#f5f5f0',
+    red: '#8b1a1a',
+    navy: '#1a2744',
+    'navy blue': '#1a2744',
+    camel: '#c4a574',
+    'gray coffee': '#6b5d52',
+    olive: '#5c6b3c',
+    'olive green': '#5c6b3c',
+    tan: '#c9a66b'
+  };
+
+  function esc(str) {
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
   }
 
-  function buildImage(p) {
-    if (p.mockupImage) {
+  function showLoading() {
+    grid.innerHTML = '<p class="shop-status">LOADING DROP…</p>';
+  }
+
+  function showError(msg) {
+    grid.innerHTML = [
+      '<div class="shop-status shop-status--error">',
+      '  <p>COULD NOT LOAD PRODUCTS</p>',
+      '  <p class="shop-status-detail">' + esc(msg) + '</p>',
+      '  <p class="shop-status-hint">Make sure each product is published to the <strong>Headless</strong> sales channel in Shopify Admin.</p>',
+      '</div>'
+    ].join('');
+  }
+
+  function getDefaultSelections(product) {
+    var sel = {};
+    (product.options || []).forEach(function (opt) {
+      if (opt.values && opt.values.length) {
+        sel[opt.name] = opt.values[0];
+      }
+    });
+    return sel;
+  }
+
+  function resolveVariant(product, selections) {
+    return window.ZCShopify.findVariant(product, selections);
+  }
+
+  function variantImage(product, selections) {
+    var v = resolveVariant(product, selections);
+    if (v && v.image) return v.image;
+    var color = selections.Color || selections.Colour || selections.color;
+    if (color) {
+      var match = product.variants.find(function (vv) {
+        return vv.options.Color === color || vv.options.Colour === color;
+      });
+      if (match && match.image) return match.image;
+    }
+    return product.mockupImage || product.image;
+  }
+
+  function buildImageHtml(product, imgUrl) {
+    var ribbon = product.ribbon
+      ? '<span class="product-ribbon">' + esc(product.ribbon) + '</span>'
+      : '';
+
+    if (product.mockupImage) {
       return [
         '<div class="product-img product-img--mockup">',
         '  <div class="product-mockup-bg"></div>',
-        '  <img class="product-mockup" src="' + p.mockupImage + '" alt="' + p.name + '" loading="lazy" />',
-        '</div>'
-      ].join('\n');
-    }
-    if (p.image) {
-      return '<div class="product-img"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy" /></div>';
-    }
-    return '<div class="product-img"><div class="product-img-placeholder">ADD PRODUCT IMAGE</div></div>';
-  }
-
-  function buildSizes(p) {
-    if (!p.sizes || !p.sizes.length) return '';
-    var btns = p.sizes.map(function (s, i) {
-      var sel = i === 0 ? ' selected' : '';
-      return '<button type="button" class="qv-size' + sel + '" data-size="' + s + '">' + s + '</button>';
-    }).join('');
-    return '<div class="qv-sizes" data-product="' + p.id + '">' + btns + '</div>';
-  }
-
-  var html = products.map(function (p, i) {
-    var ribbon = p.ribbon ? '<span class="product-ribbon">' + p.ribbon + '</span>' : '';
-    var delay  = i < 4 ? ' data-delay="' + i + '"' : '';
-    var imgBlock = buildImage(p);
-    var imgInner = imgBlock.indexOf('product-img--mockup') > -1
-      ? imgBlock
-      : imgBlock.replace('<div class="product-img">', '<div class="product-img">').replace('</div>', ribbon + '</div>');
-
-    /* Wrap ribbon inside product-img for mockup layout */
-    if (p.mockupImage) {
-      imgInner = imgBlock.replace('</div>\n', ribbon + '</div>\n');
-    } else if (p.image) {
-      imgInner = [
-        '<div class="product-img">',
-        '  <img src="' + p.image + '" alt="' + p.name + '" loading="lazy" />',
+        '  <img class="product-mockup product-card-img" src="' + esc(product.mockupImage) + '" alt="' + esc(product.name) + '" loading="lazy" />',
         '  ' + ribbon,
         '</div>'
       ].join('\n');
-    } else {
-      imgInner = [
+    }
+
+    if (imgUrl) {
+      return [
         '<div class="product-img">',
-        '  <div class="product-img-placeholder">ADD PRODUCT IMAGE</div>',
+        '  <img class="product-card-img" src="' + esc(imgUrl) + '" alt="' + esc(product.name) + '" loading="lazy" />',
         '  ' + ribbon,
         '</div>'
       ].join('\n');
     }
 
     return [
-      '<div class="product-card" data-reveal' + delay + ' data-product-id="' + p.id + '">',
-      '  ' + imgInner,
+      '<div class="product-img">',
+      '  <div class="product-img-placeholder">NO IMAGE</div>',
+      '  ' + ribbon,
+      '</div>'
+    ].join('\n');
+  }
+
+  function buildOptionPickers(product, selections) {
+    var html = [];
+
+    (product.options || []).forEach(function (opt) {
+      var name = opt.name;
+      var isColor = name.toLowerCase().indexOf('color') !== -1 || name.toLowerCase().indexOf('colour') !== -1;
+
+      if (isColor) {
+        html.push('<div class="qv-option-group"><span class="qv-option-label">' + esc(name.toUpperCase()) + '</span>');
+        html.push('<div class="qv-colors" data-option="' + esc(name) + '">');
+        opt.values.forEach(function (val, i) {
+          var sel = selections[name] === val ? ' selected' : '';
+          var swatch = COLOR_MAP[val.toLowerCase()] || '#ccc';
+          var v = product.variants.find(function (vv) { return vv.options[name] === val; });
+          var style = v && v.image
+            ? 'background-image:url(' + v.image + ');background-size:cover'
+            : 'background-color:' + swatch;
+          html.push(
+            '<button type="button" class="qv-color' + sel + '" data-option="' + esc(name) + '" data-value="' + esc(val) + '" title="' + esc(val) + '" style="' + style + '" aria-label="' + esc(val) + '"></button>'
+          );
+        });
+        html.push('</div></div>');
+      } else {
+        html.push('<div class="qv-option-group"><span class="qv-option-label">' + esc(name.toUpperCase()) + '</span>');
+        html.push('<div class="qv-sizes" data-option="' + esc(name) + '">');
+        opt.values.forEach(function (val) {
+          var sel = selections[name] === val ? ' selected' : '';
+          var testSel = Object.assign({}, selections, {});
+          testSel[name] = val;
+          var variant = resolveVariant(product, testSel);
+          var disabled = variant && !variant.available ? ' disabled' : '';
+          html.push(
+            '<button type="button" class="qv-size' + sel + disabled + '" data-option="' + esc(name) + '" data-value="' + esc(val) + '">' + esc(val) + '</button>'
+          );
+        });
+        html.push('</div></div>');
+      }
+    });
+
+    return html.join('');
+  }
+
+  function buildCard(product, index) {
+    var selections = getDefaultSelections(product);
+    var variant = resolveVariant(product, selections);
+    var price = variant ? window.ZCShopify.formatMoney(variant.price) : product.price;
+    var imgUrl = variantImage(product, selections);
+    var delay = index < 4 ? ' data-delay="' + index + '"' : '';
+
+    window.ZC_PRODUCT_CACHE[product.handle] = product;
+
+    return [
+      '<div class="product-card" data-reveal' + delay + ' data-product-handle="' + esc(product.handle) + '" data-selections=\'' + JSON.stringify(selections).replace(/'/g, '&#39;') + '\'>',
+      '  ' + buildImageHtml(product, imgUrl),
       '  <div class="product-info">',
-      '    <span class="product-name">' + p.name + '</span>',
-      '    <span class="product-price">' + p.price + '</span>',
+      '    <span class="product-name">' + esc(product.name) + '</span>',
+      '    <span class="product-price" data-price>' + esc(price) + '</span>',
       '  </div>',
       '  <div class="quick-view">',
-      '    <span class="qv-name">' + p.name + '</span>',
-      '    <span class="qv-price">' + p.price + '</span>',
-      '    ' + buildSizes(p),
+      '    <span class="qv-name">' + esc(product.name) + '</span>',
+      '    <span class="qv-price" data-price>' + esc(price) + '</span>',
+      '    <div class="qv-options">' + buildOptionPickers(product, selections) + '</div>',
       '    <div class="qv-actions">',
-      '      <button type="button" class="btn btn-fill btn-add-cart" data-product-id="' + p.id + '">ADD TO CART</button>',
+      '      <button type="button" class="btn btn-fill btn-add-cart" data-product-handle="' + esc(product.handle) + '">ADD TO CART</button>',
       '    </div>',
       '  </div>',
       '</div>'
     ].join('\n');
-  });
-
-  grid.innerHTML = html.join('\n');
-
-  /* IntersectionObserver for reveal animations */
-  var newCards = grid.querySelectorAll('[data-reveal]');
-  if ('IntersectionObserver' in window && newCards.length) {
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          obs.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.08 });
-    newCards.forEach(function (el) { obs.observe(el); });
-  } else {
-    newCards.forEach(function (el) { el.classList.add('visible'); });
   }
 
-  /* Size selection */
-  grid.addEventListener('click', function (e) {
-    var sizeBtn = e.target.closest('.qv-size');
-    if (sizeBtn) {
-      var group = sizeBtn.closest('.qv-sizes');
-      group.querySelectorAll('.qv-size').forEach(function (b) { b.classList.remove('selected'); });
-      sizeBtn.classList.add('selected');
-      e.stopPropagation();
+  function getCardSelections(card) {
+    try {
+      return JSON.parse(card.getAttribute('data-selections') || '{}');
+    } catch (e) {
+      return {};
     }
-  });
+  }
 
-  /* Add to cart */
-  grid.addEventListener('click', function (e) {
-    var addBtn = e.target.closest('.btn-add-cart');
-    if (!addBtn) return;
-    e.preventDefault();
-    e.stopPropagation();
+  function setCardSelections(card, selections) {
+    card.setAttribute('data-selections', JSON.stringify(selections));
+  }
 
-    var productId = addBtn.getAttribute('data-product-id');
-    var card = addBtn.closest('.product-card');
-    var sizeEl = card ? card.querySelector('.qv-size.selected') : null;
-    var size = sizeEl ? sizeEl.getAttribute('data-size') : '';
+  function updateCardUI(card) {
+    var handle = card.getAttribute('data-product-handle');
+    var product = window.ZC_PRODUCT_CACHE[handle];
+    if (!product) return;
 
-    addBtn.classList.add('adding');
-    setTimeout(function () { addBtn.classList.remove('adding'); }, 550);
+    var selections = getCardSelections(card);
+    var variant = resolveVariant(product, selections);
+    var price = variant ? window.ZCShopify.formatMoney(variant.price) : product.price;
+    var imgUrl = variantImage(product, selections);
 
-    if (window.ZC_CART) {
-      window.ZC_CART.add(productId, size);
+    card.querySelectorAll('[data-price]').forEach(function (el) {
+      el.textContent = price;
+    });
+
+    if (!product.mockupImage) {
+      var img = card.querySelector('.product-card-img');
+      if (img && imgUrl) img.src = imgUrl;
     }
-  });
 
-  /* Mobile quick-view toggle */
-  if (window.matchMedia('(hover: none)').matches) {
-    grid.querySelectorAll('.product-card').forEach(function (card) {
-      card.addEventListener('click', function (e) {
-        if (e.target.closest('.qv-actions, .qv-sizes, .btn-add-cart')) return;
+    card.querySelectorAll('.qv-color, .qv-size').forEach(function (btn) {
+      var opt = btn.getAttribute('data-option');
+      var val = btn.getAttribute('data-value');
+      btn.classList.toggle('selected', selections[opt] === val);
+    });
+
+    /* Refresh size availability for current color */
+    card.querySelectorAll('.qv-size').forEach(function (btn) {
+      var opt = btn.getAttribute('data-option');
+      var val = btn.getAttribute('data-value');
+      var testSel = Object.assign({}, selections);
+      testSel[opt] = val;
+      var v = resolveVariant(product, testSel);
+      btn.disabled = !!(v && !v.available);
+    });
+  }
+
+  function initReveal() {
+    var cards = grid.querySelectorAll('[data-reveal]');
+    if ('IntersectionObserver' in window && cards.length) {
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08 });
+      cards.forEach(function (el) { obs.observe(el); });
+    } else {
+      cards.forEach(function (el) { el.classList.add('visible'); });
+    }
+  }
+
+  function bindEvents() {
+    grid.addEventListener('click', function (e) {
+      var colorBtn = e.target.closest('.qv-color');
+      var sizeBtn  = e.target.closest('.qv-size');
+
+      if (colorBtn || sizeBtn) {
+        var btn = colorBtn || sizeBtn;
+        if (btn.disabled) return;
+        var card = btn.closest('.product-card');
+        var opt = btn.getAttribute('data-option');
+        var val = btn.getAttribute('data-value');
+        var selections = getCardSelections(card);
+        selections[opt] = val;
+        setCardSelections(card, selections);
+        updateCardUI(card);
+        e.stopPropagation();
+        return;
+      }
+
+      var addBtn = e.target.closest('.btn-add-cart');
+      if (addBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        var card = addBtn.closest('.product-card');
+        var handle = addBtn.getAttribute('data-product-handle');
+        var product = window.ZC_PRODUCT_CACHE[handle];
+        var selections = getCardSelections(card);
+        var variant = resolveVariant(product, selections);
+
+        if (!variant) {
+          alert('Please select all options.');
+          return;
+        }
+        if (!variant.available) {
+          alert('This combination is sold out.');
+          return;
+        }
+
+        addBtn.classList.add('adding');
+        setTimeout(function () { addBtn.classList.remove('adding'); }, 550);
+
+        if (window.ZC_CART) {
+          window.ZC_CART.addVariant({
+            variantId: variant.id,
+            productHandle: handle,
+            title: product.name,
+            variantTitle: Object.values(variant.options).join(' / '),
+            price: variant.price,
+            image: variant.image || product.image
+          });
+        }
+        return;
+      }
+
+      if (window.matchMedia('(hover: none)').matches) {
+        var card = e.target.closest('.product-card');
+        if (!card || e.target.closest('.qv-actions, .qv-options, .btn-add-cart')) return;
         var wasOpen = card.classList.contains('open');
         grid.querySelectorAll('.product-card.open').forEach(function (c) { c.classList.remove('open'); });
         if (!wasOpen) card.classList.add('open');
-      });
+      }
     });
   }
+
+  function render(products) {
+    if (!products.length) {
+      grid.innerHTML = '<p class="shop-status">NO PRODUCTS YET — add items in Tapstitch/Shopify and publish to Headless.</p>';
+      return;
+    }
+    grid.innerHTML = products.map(buildCard).join('');
+    initReveal();
+    bindEvents();
+  }
+
+  function init() {
+    showLoading();
+
+    if (!window.ZCShopify || !window.ZCShopify.isReady()) {
+      showError('Shopify is not configured. Check data/shop-config.js');
+      return;
+    }
+
+    window.ZCShopify.fetchProducts()
+      .then(render)
+      .catch(function (err) {
+        console.error('[ZC Shop]', err);
+        showError(err.message || 'Unknown error');
+      });
+  }
+
+  init();
 
 })();

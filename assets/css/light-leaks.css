@@ -270,20 +270,38 @@
   pointer-events: auto;
 }
 
-/* The dark veil — solid black; text sits above with its own beam mask */
-#ll-dark {
+/* Solid black base — blocks scene/eye from showing through the beam */
+#ll-fl-base {
   position: absolute;
   inset: 0;
   background: #0A0806;
-  z-index: 1;
+  z-index: 0;
 }
 
-/* Hidden text — masked so it only appears inside the flashlight beam */
+/* Hidden track text — only visible where ll-dark mask is transparent */
 #ll-hidden-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Warm god-ray glow inside the beam */
+#ll-beam {
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
+  will-change: background;
+  mix-blend-mode: screen;
+}
+
+/* Dark veil — mask punched out by JS; opaque edges, transparent center */
+#ll-dark {
+  position: absolute;
+  inset: 0;
+  background: #0A0806;
+  z-index: 3;
   will-change: mask-image, -webkit-mask-image;
 }
 
@@ -328,7 +346,7 @@
   position: absolute;
   top: 68px; /* below topbar */
   right: 22px;
-  z-index: 2;
+  z-index: 5;
   font-family: var(--font);
   font-size: 1rem;
   font-weight: 400;

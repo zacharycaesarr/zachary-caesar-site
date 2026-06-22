@@ -19,6 +19,7 @@
   var btnExamine  = document.getElementById('ll-btn-examine');
   var flashlight  = document.getElementById('ll-flashlight');
   var llDark      = document.getElementById('ll-dark');
+  var llBeam      = document.getElementById('ll-beam');
   var hiddenLayer = document.getElementById('ll-hidden-layer');
   var llClose     = document.getElementById('ll-close');
   var irisEl      = document.getElementById('ll-iris');
@@ -276,12 +277,25 @@
 
   function applyFlashlight(x, y) {
     var r = FL_RADIUS;
-    /* Text layer: opaque in beam, transparent outside */
-    var textMask = 'radial-gradient(circle ' + r + 'px at ' + x + 'px ' + y + 'px,' +
-                   '#000 0%,#000 48%,transparent 70%,transparent 100%)';
-    if (hiddenLayer) {
-      hiddenLayer.style.webkitMaskImage = textMask;
-      hiddenLayer.style.maskImage       = textMask;
+
+    /* Dark overlay — transparent hole reveals warm beam + text below */
+    var darkMask = 'radial-gradient(circle ' + r + 'px at ' + x + 'px ' + y + 'px,' +
+                   'transparent 0%, transparent 38%,' +
+                   'rgba(0,0,0,0.55) 58%, #0A0806 82%)';
+    if (llDark) {
+      llDark.style.webkitMaskImage = darkMask;
+      llDark.style.maskImage       = darkMask;
+    }
+
+    /* Warm god-ray glow — the visible "flashlight" */
+    var beamGrad = 'radial-gradient(circle ' + Math.round(r * 1.2) + 'px at ' + x + 'px ' + y + 'px,' +
+                   'rgba(255,252,242,0.72) 0%,' +
+                   'rgba(255,228,180,0.38) 22%,' +
+                   'rgba(192,144,64,0.18) 42%,' +
+                   'rgba(192,144,64,0.06) 58%,' +
+                   'transparent 72%)';
+    if (llBeam) {
+      llBeam.style.background = beamGrad;
     }
   }
 

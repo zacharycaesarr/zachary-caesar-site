@@ -1,7 +1,6 @@
 /* ================================================================
    shopify-client.js
-   Talks to Shopify Storefront API for cart + checkout.
-   Only active when data/shop-config.js has enabled: true.
+   Storefront API — products, variants, cart, checkout
    ================================================================ */
 
 (function () {
@@ -9,6 +8,26 @@
 
   var cfg = window.ZC_SHOP_CONFIG || {};
   var API_VERSION = '2024-10';
+
+  var PRODUCT_FIELDS = [
+    'id',
+    'handle',
+    'title',
+    'description',
+    'featuredImage { url altText }',
+    'priceRange { minVariantPrice { amount currencyCode } maxVariantPrice { amount currencyCode } }',
+    'options { name values }',
+    'variants(first: 100) {',
+    '  edges { node {',
+    '    id',
+    '    title',
+    '    availableForSale',
+    '    price { amount currencyCode }',
+    '    image { url altText }',
+    '    selectedOptions { name value }',
+    '  } }',
+    '}'
+  ].join('\n');
 
   function isReady() {
     return cfg.enabled && cfg.storeDomain && cfg.storefrontAccessToken;
@@ -36,7 +55,116 @@
       });
   }
 
-  /* ── Cart mutations ─────────────────────────────── */
+  function formatMoney(amount, currencyCode) {
+    var sym = cfg.currencySymbol || '$';
+    var n = parseFloat(amount);
+    if (isNaN(n)) return sym + '0.00';
+    return sym + n.toFixed(2);
+  }
+
+  function parseVariant(node) {
+    var opts = {};
+    (node.selectedOptions || []).forEach(function (o) {
+      opts[o.name] = o.value;
+    });
+    return {
+      id: node.id,
+      title: node.title,
+      price: parseFloat(node.price.amount),
+      currency: node.price.currencyCode,
+      available: node.availableForSale,
+      image: node.image ? node.image.url : null,
+      options: opts
+    };
+  }
+
+  function normalizeProduct(node) {
+    var overrides = (window.ZC_PRODUCT_OVERRIDES || {})[node.handle] || {};
+    var variants = (node.variants.edges || []).map(function (e) {
+      return parseVariant(e.node);
+    });
+
+    var minPrice = node.priceRange.minVariantPrice;
+
+    return {
+      id: node.handle,
+      handle: node.handle,
+      gid: node.id,
+      name: overrides.displayName || node.title,
+      description: node.description || '',
+      ribbon: overrides.ribbon || '',
+      mockupImage: overrides.mockupImage || null,
+      image: node.featuredImage ? node.featuredImage.url : null,
+      price: formatMoney(minPrice.amount, minPrice.currencyCode),
+      priceAmount: parseFloat(minPrice.amount),
+      options: node.options || [],
+      variants: variants
+    };
+  }
+
+  function findVariant(product, selections) {
+    if (!product || !product.variants) return null;
+    return product.variants.find(function (v) {
+      return Object.keys(selections).every(function (key) {
+        return v.options[key] === selections[key];
+      });
+    }) || null;
+  }
+
+  function getOptionValues(product, optionName) {
+    var opt = (product.options || []).find(function (o) {
+      return o.name.toLowerCase() === optionName.toLowerCase();
+    });
+    return opt ? opt.values : [];
+  }
+
+  /* ── Product queries ────────────────────────────── */
+
+  function fetchProducts() {
+    if (!isReady()) {
+      return Promise.reject(new Error('Shopify not configured'));
+    }
+
+    var handle = cfg.collectionHandle;
+
+    if (handle) {
+      var collectionQuery = [
+        'query collectionProducts($handle: String!) {',
+        '  collection(handle: $handle) {',
+        '    title',
+        '    products(first: 50) {',
+        '      edges { node { ' + PRODUCT_FIELDS + ' } }',
+        '    }',
+        '  }',
+        '}'
+      ].join('\n');
+
+      return gql(collectionQuery, { handle: handle }).then(function (data) {
+        if (!data.collection) {
+          throw new Error('Collection "' + handle + '" not found. Check collectionHandle in shop-config.js');
+        }
+        return (data.collection.products.edges || []).map(function (e) {
+          return normalizeProduct(e.node);
+        });
+      });
+    }
+
+    var allQuery = [
+      'query allProducts {',
+      '  products(first: 50) {',
+      '    edges { node { ' + PRODUCT_FIELDS + ' } }',
+      '  }',
+      '}'
+    ].join('\n');
+
+    return gql(allQuery).then(function (data) {
+      return (data.products.edges || []).map(function (e) {
+        return normalizeProduct(e.node);
+      });
+    });
+  }
+
+  /* ── Cart ───────────────────────────────────────── */
 
   var CART_CREATE = [
     'mutation cartCreate($input: CartInput!) {',
@@ -52,7 +180,9 @@
     '  cartLinesAdd(cartId: $cartId, lines: $lines) {',
     '    cart { id checkoutUrl totalQuantity cost { totalAmount { amount currencyCode } }',
     '      lines(first: 50) { edges { node { id quantity merchandise { ... on ProductVariant {',
-    '        id title price { amount currencyCode } product { title featuredImage { url } }',
+    '        id title price { amount currencyCode } image { url }',
+    '        product { title featuredImage { url } }',
+    '        selectedOptions { name value }',
     '      } } } } } }',
     '    userErrors { field message }',
     '  }',
@@ -64,7 +194,9 @@
     '  cartLinesUpdate(cartId: $cartId, lines: $lines) {',
     '    cart { id checkoutUrl totalQuantity cost { totalAmount { amount currencyCode } }',
     '      lines(first: 50) { edges { node { id quantity merchandise { ... on ProductVariant {',
-    '        id title price { amount currencyCode } product { title featuredImage { url } }',
+    '        id title price { amount currencyCode } image { url }',
+    '        product { title featuredImage { url } }',
+    '        selectedOptions { name value }',
     '      } } } } } }',
     '    userErrors { field message }',
     '  }',
@@ -76,7 +208,9 @@
     '  cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {',
     '    cart { id checkoutUrl totalQuantity cost { totalAmount { amount currencyCode } }',
     '      lines(first: 50) { edges { node { id quantity merchandise { ... on ProductVariant {',
-    '        id title price { amount currencyCode } product { title featuredImage { url } }',
+    '        id title price { amount currencyCode } image { url }',
+    '        product { title featuredImage { url } }',
+    '        selectedOptions { name value }',
     '      } } } } } }',
     '    userErrors { field message }',
     '  }',
@@ -89,32 +223,38 @@
     '    id checkoutUrl totalQuantity',
     '    cost { totalAmount { amount currencyCode } }',
     '    lines(first: 50) { edges { node { id quantity merchandise { ... on ProductVariant {',
-    '      id title price { amount currencyCode } product { title featuredImage { url } }',
+    '      id title price { amount currencyCode } image { url }',
+    '      product { title featuredImage { url } }',
+    '      selectedOptions { name value }',
     '    } } } } } }',
     '  }',
     '}'
   ].join('\n');
 
   function parseCart(data) {
-    var cart = data.cart || data.cartCreate && data.cartCreate.cart ||
-               data.cartLinesAdd && data.cartLinesAdd.cart ||
-               data.cartLinesUpdate && data.cartLinesUpdate.cart ||
-               data.cartLinesRemove && data.cartLinesRemove.cart;
+    var cart = data.cart || (data.cartCreate && data.cartCreate.cart) ||
+               (data.cartLinesAdd && data.cartLinesAdd.cart) ||
+               (data.cartLinesUpdate && data.cartLinesUpdate.cart) ||
+               (data.cartLinesRemove && data.cartLinesRemove.cart);
     if (!cart) return null;
 
     var lines = (cart.lines && cart.lines.edges || []).map(function (edge) {
       var node = edge.node;
       var merch = node.merchandise || {};
       var product = merch.product || {};
+      var opts = (merch.selectedOptions || []).map(function (o) {
+        return o.value;
+      }).join(' / ');
+
       return {
         lineId: node.id,
         quantity: node.quantity,
         variantId: merch.id,
         title: product.title || merch.title || 'Item',
-        variantTitle: merch.title !== product.title ? merch.title : '',
+        variantTitle: opts || (merch.title !== product.title ? merch.title : ''),
         price: merch.price ? parseFloat(merch.price.amount) : 0,
         currency: merch.price ? merch.price.currencyCode : cfg.currency,
-        image: product.featuredImage ? product.featuredImage.url : null
+        image: (merch.image && merch.image.url) || (product.featuredImage && product.featuredImage.url) || null
       };
     });
 
@@ -129,8 +269,11 @@
   }
 
   window.ZCShopify = {
-
     isReady: isReady,
+    fetchProducts: fetchProducts,
+    findVariant: findVariant,
+    getOptionValues: getOptionValues,
+    formatMoney: formatMoney,
 
     createCart: function () {
       return gql(CART_CREATE, { input: {} }).then(function (data) {
@@ -172,7 +315,6 @@
         return parseCart(data);
       });
     }
-
   };
 
 })();

@@ -51,23 +51,11 @@
       </div>
 
       <!--
-        ============================================================
-        ADDING / REMOVING PRODUCTS
-        ============================================================
-        Edit ONE file: data/products.js
-        You can do this directly on GitHub without any coding tools:
-          1. Open github.com → your repo
-          2. Click data/ → products.js
-          3. Click the pencil icon (Edit this file)
-          4. Add or remove product blocks following the examples
-          5. Click "Commit changes" → live in ~30 seconds
-
-        When Shopify is connected, set each product's "shopifyUrl"
-        to the real Shopify product URL and the buttons go live.
-        ============================================================
+        Products load automatically from Shopify (all colors, sizes, prices).
+        Optional ribbons/custom images → data/product-overrides.js
+        Shopify settings → data/shop-config.js
       -->
 
-      <!-- Cards are injected here by shop.js reading data/products.js -->
       <div class="product-grid" id="zc-product-grid"></div>
 
     </main>
@@ -103,7 +91,7 @@
     </aside>
 
     <script src="data/shop-config.js"></script>
-    <script src="data/products.js"></script>
+    <script src="data/product-overrides.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/scroll-effects.js"></script>
     <script src="assets/js/gesture.js"></script>

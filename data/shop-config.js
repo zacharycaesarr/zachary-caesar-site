@@ -2,60 +2,44 @@
    SHOP CONFIG — Zachary Caesar
    ================================================================
 
-   Fill this in ONCE when your Shopify store is ready.
-   You can edit this file directly on GitHub (pencil icon).
+   HOW TO ADD NEW MERCH (no coding):
+   ─────────────────────────────────
+   1. Design in Tapstitch → syncs to Shopify automatically
+   2. In Shopify Admin → Products → open product → scroll to SALES CHANNELS
+   3. Make sure "Headless" (or your custom storefront app) is checked ✓
+   4. Add product to your collection (see collectionHandle below)
+   5. Done — it appears on your site within seconds of refresh
 
-   WHAT YOU NEED FROM SHOPIFY:
-   ───────────────────────────
-   1. Store domain
-      → Settings → Domains → your-store.myshopify.com
-      Example: "zachary-caesar.myshopify.com"
+   OPTIONAL styling tweaks → data/product-overrides.js (ribbons, custom PNGs)
 
-   2. Storefront API access token (public — safe to use on your site)
-      → Settings → Apps and sales channels → Develop apps
-      → Create an app → Configure Storefront API scopes:
-         unauthenticated_read_product_listings
-         unauthenticated_read_product_inventory
-         unauthenticated_read_checkouts
-         unauthenticated_write_checkouts
-         unauthenticated_read_customers (optional)
-      → Install app → copy "Storefront API access token"
+   PARTNER / DEV STORES:
+   ─────────────────────
+   Shopify Partner development stores work the same way. Just publish
+   products to the Headless / Storefront API sales channel.
 
-   3. Products created in Shopify (synced with Tapstitch)
-      → Each product needs a Variant ID copied into data/products.js
-
-   WHAT YOU NEED FROM TAPSTITCH:
-   ───────────────────────────
-   - Design your merch in Tapstitch
-   - Connect Tapstitch → Shopify (they have an integration)
-   - Products auto-sync to Shopify; you grab variant IDs from Shopify admin
-
-   HOW CHECKOUT WORKS:
-   ───────────────────
-   - Cart lives ON YOUR SITE (animated drawer, add/remove items)
-   - When customer clicks CHECKOUT → goes to Shopify's secure payment page
-   - This is NOT your Shopify storefront theme — it's a checkout-only URL
-   - After payment, Tapstitch fulfills the order automatically
-
-   Set "enabled" to true once storeDomain + storefrontAccessToken are filled in.
-   Until then, the shop runs in DEMO MODE (cart works locally for testing UI).
    ================================================================ */
 
 window.ZC_SHOP_CONFIG = {
 
-  /* Flip to true when Shopify credentials below are filled in */
-  enabled: false,
+  enabled: true,
 
-  /* Your .myshopify.com domain (no https://) */
-  storeDomain: "",
+  storeDomain: "zachary-caesar.myshopify.com",
 
-  /* Storefront API access token from your custom Shopify app */
-  storefrontAccessToken: "",
+  storefrontAccessToken: "4f93e5a8affb26d8e86507d34a84e522",
 
   currency: "USD",
   currencySymbol: "$",
 
-  /* Optional: custom checkout branding appears on Shopify checkout page */
-  checkoutBrandName: "Zachary Caesar"
+  checkoutBrandName: "ZACHARY CAESAR.",
+
+  /*
+   * Collection handle — products in this Shopify collection show on your site.
+   * Create: Shopify Admin → Products → Collections → Create collection
+   * Add your Tapstitch products to it, then paste the handle here.
+   * The handle is the URL slug, e.g. "light-leaks-drop" for /collections/light-leaks-drop
+   *
+   * Leave empty ("") to show ALL published products instead.
+   */
+  collectionHandle: ""
 
 };
