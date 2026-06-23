@@ -589,6 +589,18 @@ body.cart-open { overflow: hidden; }
   overflow: hidden;
 }
 
+.pd-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pd-head {
+  flex-shrink: 0;
+  padding: 24px 24px 0;
+}
+
 .pd-gallery {
   padding: 24px 20px 16px;
   display: flex;
@@ -596,11 +608,13 @@ body.cart-open { overflow: hidden; }
   gap: 12px;
   border-right: 1px solid rgba(14, 12, 8, 0.07);
   min-height: 0;
+  align-items: center;
 }
 
 .pd-main-wrap {
   position: relative;
   flex: 1;
+  width: 100%;
   min-height: 0;
   max-height: 100%;
   display: flex;
@@ -624,9 +638,12 @@ body.cart-open { overflow: hidden; }
 .pd-main-img {
   position: relative;
   z-index: 1;
-  width: 88%;
-  height: 88%;
-  max-height: 100%;
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  height: auto;
+  max-width: 88%;
+  max-height: 88%;
   object-fit: contain;
   object-position: center;
   transition: opacity 220ms ease;
@@ -684,6 +701,9 @@ body.cart-open { overflow: hidden; }
   gap: 8px;
   overflow-x: auto;
   flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  justify-content: flex-start;
   padding-bottom: 2px;
   -webkit-overflow-scrolling: touch;
 }
@@ -712,7 +732,8 @@ body.cart-open { overflow: hidden; }
 }
 
 .pd-body {
-  padding: 28px 24px 20px;
+  flex: 1;
+  padding: 16px 24px 20px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: flex;
@@ -727,7 +748,8 @@ body.cart-open { overflow: hidden; }
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.15;
-  padding-right: 28px;
+  padding-right: 36px;
+  margin: 0;
 }
 
 .pd-price {
@@ -736,6 +758,7 @@ body.cart-open { overflow: hidden; }
   font-weight: 600;
   color: var(--muted);
   letter-spacing: 0.04em;
+  margin: 6px 0 0;
 }
 
 .pd-desc {
@@ -789,6 +812,55 @@ body.cart-open { overflow: hidden; }
   line-height: 1.55;
   color: var(--muted);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Formatted size table (auto-detected from Shopify/Tapstitch) */
+.zc-size-table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+  margin: 0 0 12px;
+  font-size: 0.62rem;
+}
+
+.zc-size-table th,
+.zc-size-table td {
+  border: 1px solid rgba(14, 12, 8, 0.14);
+  padding: 7px 8px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.zc-size-table thead th {
+  background: rgba(14, 12, 8, 0.06);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.58rem;
+}
+
+.zc-size-table tbody th,
+.zc-size-table tr td:first-child {
+  text-align: left;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.zc-garment-specs {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zc-garment-specs li {
+  font-size: 0.65rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
 }
 
 .pd-size-guide-content table {
@@ -802,7 +874,7 @@ body.cart-open { overflow: hidden; }
 .pd-size-guide-content td {
   border: 1px solid rgba(14, 12, 8, 0.12);
   padding: 6px 8px;
-  text-align: left;
+  text-align: center;
 }
 
 .pd-size-guide-content p {
@@ -842,40 +914,68 @@ body.pd-open { overflow: hidden; }
     transform: translateY(0);
   }
 
+  #zc-pd-close {
+    top: 12px;
+    right: 12px;
+    z-index: 6;
+  }
+
   .pd-inner {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-height: 0;
   }
 
   .pd-gallery {
+    width: 100%;
     border-right: none;
-    border-bottom: 1px solid rgba(14, 12, 8, 0.07);
-    padding: 16px 16px 10px;
+    border-bottom: none;
+    padding: 48px 16px 8px;
     flex: none;
+    align-items: center;
   }
 
   .pd-main-wrap {
-    height: min(38svh, 300px);
-    max-height: 38svh;
+    width: 100%;
+    height: min(36svh, 280px);
+    max-height: 36svh;
     flex: none;
   }
 
   .pd-main-img {
-    width: 92%;
-    height: 92%;
+    max-width: 78%;
+    max-height: 90%;
+  }
+
+  .pd-thumbs {
+    justify-content: center;
+    padding: 8px 0 4px;
+  }
+
+  .pd-content {
+    width: 100%;
+    flex: none;
+    overflow: visible;
+  }
+
+  .pd-head {
+    padding: 12px 18px 0;
+    position: relative;
+    z-index: 2;
+    background: rgba(250, 245, 237, 0.98);
   }
 
   .pd-body {
-    padding: 18px 18px 12px;
+    padding: 14px 18px 16px;
     overflow: visible;
     flex: none;
   }
 
   .pd-footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 4;
+    flex-shrink: 0;
     padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
   }
 }

@@ -80,32 +80,104 @@
     };
   }
 
+  function stripTags(html) {
+    var el = document.createElement('div');
+    el.innerHTML = html;
+    return (el.textContent || el.innerText || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function looksLikeSizeGuide(htmlOrText) {
+    if (!htmlOrText) return false;
+    var text = stripTags(htmlOrText);
+    return (
+      /<table/i.test(htmlOrText) ||
+      (/\bLength\b/i.test(text) && /\bChest\b/i.test(text)) ||
+      (/\binch\b/i.test(text) && /\bcm\b/i.test(text) && /\b(XL|2XL|S\b|M\b|L\b)/i.test(text)) ||
+      /\bGender\s*:/i.test(text) ||
+      /\bFabric Weight\b/i.test(text) ||
+      /\bSleeve length\b/i.test(text)
+    );
+  }
+
+  function formatSizeGuideHtml(html) {
+    if (!html) return '';
+
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+
+    var table = wrap.querySelector('table');
+    var out   = document.createElement('div');
+    out.className = 'zc-size-guide-formatted';
+
+    if (table) {
+      table.classList.add('zc-size-table');
+      var tableClone = table.cloneNode(true);
+      out.appendChild(tableClone);
+    }
+
+    /* Garment specs below table (Gender, Fabric, etc.) */
+    var specLines = [];
+    wrap.querySelectorAll('p, li, span, div').forEach(function (el) {
+      if (el.closest('table')) return;
+      var t = (el.textContent || '').trim();
+      if (!t || t.length > 200) return;
+      if (/\b(Gender|Fabric|Features|Thickness)\b/i.test(t)) {
+        specLines.push(t);
+      }
+    });
+
+    if (!specLines.length) {
+      var plain = stripTags(html);
+      var specMatch = plain.match(/Gender\s*:[\s\S]*/i);
+      if (specMatch) specLines.push(specMatch[0].trim());
+    }
+
+    if (specLines.length) {
+      var ul = document.createElement('ul');
+      ul.className = 'zc-garment-specs';
+      specLines.forEach(function (line) {
+        var li = document.createElement('li');
+        li.textContent = line;
+        ul.appendChild(li);
+      });
+      out.appendChild(ul);
+    }
+
+    if (!table && !specLines.length) {
+      out.innerHTML = html;
+    }
+
+    return out.innerHTML;
+  }
+
   function parseDescription(html) {
     if (!html) return { summary: '', sizeGuideHtml: '' };
 
-    var tableIdx = html.search(/<table/i);
-    if (tableIdx >= 0) {
-      var before = html.slice(0, tableIdx);
-      var guide  = html.slice(tableIdx);
-      var summary = before.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      return { summary: summary, sizeGuideHtml: guide };
+    if (!looksLikeSizeGuide(html)) {
+      return { summary: stripTags(html), sizeGuideHtml: '' };
     }
 
-    var specIdx = html.search(/\b(Length|Chest|Sleeve length|Gender|Fabric)\s*[:/]/i);
-    if (specIdx > 0) {
-      return {
-        summary: html.slice(0, specIdx).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
-        sizeGuideHtml: html.slice(specIdx)
-      };
+    var markers = [
+      html.search(/<table/i),
+      html.search(/\b(S|Size|M|L|XL)\b[\s\S]{0,80}\binch\b/i),
+      html.search(/\bLength\b/i),
+      html.search(/\bGender\s*:/i)
+    ].filter(function (i) { return i >= 0; });
+
+    var splitAt = markers.length ? Math.min.apply(null, markers) : 0;
+
+    if (splitAt <= 0) {
+      return { summary: '', sizeGuideHtml: formatSizeGuideHtml(html) };
     }
 
-    if (/Length|Chest|Sleeve|Gender|Fabric Weight/i.test(html)) {
-      return { summary: '', sizeGuideHtml: html };
-    }
+    var intro   = html.slice(0, splitAt);
+    var guide   = html.slice(splitAt);
+    var summary = stripTags(intro);
+    if (looksLikeSizeGuide(summary)) summary = '';
 
     return {
-      summary: html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
-      sizeGuideHtml: ''
+      summary: summary,
+      sizeGuideHtml: formatSizeGuideHtml(guide)
     };
   }
 
@@ -141,6 +213,8 @@
     var images = collectImages(node);
     var rawDesc = overrides.description || node.description || '';
     var parsed  = parseDescription(rawDesc);
+    var summary = overrides.shortDescription || parsed.summary || '';
+    if (looksLikeSizeGuide(summary)) summary = '';
 
     return {
       id: node.handle,
@@ -148,7 +222,7 @@
       gid: node.id,
       name: overrides.displayName || node.title,
       description: rawDesc,
-      shortDescription: overrides.shortDescription || parsed.summary || '',
+      shortDescription: summary,
       sizeGuideHtml: parsed.sizeGuideHtml,
       ribbon: overrides.ribbon || '',
       mockupImage: overrides.mockupImage || null,

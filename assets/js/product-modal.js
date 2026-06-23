@@ -209,6 +209,10 @@
     titleEl.textContent = product.name;
 
     var summary = product.shortDescription || '';
+    /* Safety: never show size-guide data in description slot */
+    if (/\bLength\b/i.test(summary) && /\bChest\b/i.test(summary)) summary = '';
+    if (/\binch\b/i.test(summary) && /\bcm\b/i.test(summary)) summary = '';
+
     descEl.textContent = summary;
     descEl.hidden = !summary;
 
