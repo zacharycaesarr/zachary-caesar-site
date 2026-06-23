@@ -15,6 +15,7 @@
    "your-product-handle": {
      ribbon: "HOT",
      displayName: "SHORTER NAME",
+     shortDescription: "Your marketing copy goes here — what the piece is about, the drop story, etc.",
      mockupImage: "assets/img/products/your-file.png"
    }
 
@@ -30,10 +31,11 @@
 
 window.ZC_PRODUCT_OVERRIDES = {
 
-  /* Example (uncomment and edit when you have a transparent PNG):
+  /* Example (uncomment and edit):
   "love-2-feed-fear-cotton-t-shirt-v2": {
     ribbon: "HOT",
     displayName: "LOVE 2 FEED FEAR TEE",
+    shortDescription: "Part of the Light Leaks drop. Feed the fear.",
     mockupImage: "assets/img/products/love-2-feed-fear.png"
   }
   */

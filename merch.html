@@ -94,21 +94,30 @@
     <div id="zc-pd-overlay" aria-hidden="true"></div>
     <div id="zc-product-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pd-title">
       <button type="button" id="zc-pd-close" aria-label="Close product view">×</button>
-      <div class="pd-layout">
+      <div class="pd-inner">
         <div class="pd-gallery">
-          <div class="pd-main-wrap">
+          <div class="pd-main-wrap" id="pd-main-wrap">
             <div class="pd-img-bg" aria-hidden="true"></div>
+            <button type="button" class="pd-nav pd-nav--prev" id="pd-prev" aria-label="Previous image">‹</button>
             <img id="pd-main-img" class="pd-main-img" src="" alt="" />
+            <button type="button" class="pd-nav pd-nav--next" id="pd-next" aria-label="Next image">›</button>
+            <span class="pd-img-counter" id="pd-img-counter" aria-live="polite"></span>
           </div>
           <div class="pd-thumbs" id="pd-thumbs"></div>
         </div>
-        <div class="pd-info">
+        <div class="pd-body">
           <h2 class="pd-title" id="pd-title"></h2>
           <p class="pd-price" id="pd-price"></p>
           <p class="pd-desc" id="pd-desc"></p>
           <div class="pd-options" id="pd-options"></div>
-          <button type="button" class="btn btn-fill btn-add-cart" id="pd-add-cart">ADD TO CART</button>
+          <details class="pd-size-guide" id="pd-size-guide" hidden>
+            <summary>SIZE GUIDE &amp; GARMENT INFO</summary>
+            <div class="pd-size-guide-content" id="pd-size-guide-content"></div>
+          </details>
         </div>
+      </div>
+      <div class="pd-footer">
+        <button type="button" class="btn btn-fill btn-add-cart" id="pd-add-cart">ADD TO CART</button>
       </div>
     </div>
 

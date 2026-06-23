@@ -15,7 +15,8 @@
     'title',
     'description',
     'featuredImage { url altText }',
-    'images(first: 20) { edges { node { url altText } } }',
+    'images(first: 50) { edges { node { url altText } } }',
+    'media(first: 50) { edges { node { mediaContentType ... on MediaImage { image { url altText } } } } }',
     'priceRange { minVariantPrice { amount currencyCode } maxVariantPrice { amount currencyCode } }',
     'options { name values }',
     'variants(first: 100) {',
@@ -79,6 +80,57 @@
     };
   }
 
+  function parseDescription(html) {
+    if (!html) return { summary: '', sizeGuideHtml: '' };
+
+    var tableIdx = html.search(/<table/i);
+    if (tableIdx >= 0) {
+      var before = html.slice(0, tableIdx);
+      var guide  = html.slice(tableIdx);
+      var summary = before.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      return { summary: summary, sizeGuideHtml: guide };
+    }
+
+    var specIdx = html.search(/\b(Length|Chest|Sleeve length|Gender|Fabric)\s*[:/]/i);
+    if (specIdx > 0) {
+      return {
+        summary: html.slice(0, specIdx).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+        sizeGuideHtml: html.slice(specIdx)
+      };
+    }
+
+    if (/Length|Chest|Sleeve|Gender|Fabric Weight/i.test(html)) {
+      return { summary: '', sizeGuideHtml: html };
+    }
+
+    return {
+      summary: html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+      sizeGuideHtml: ''
+    };
+  }
+
+  function collectImages(node) {
+    var seen = {};
+    var list = [];
+
+    function add(url) {
+      if (!url || seen[url]) return;
+      seen[url] = true;
+      list.push(url);
+    }
+
+    if (node.featuredImage) add(node.featuredImage.url);
+    (node.images && node.images.edges || []).forEach(function (e) {
+      add(e.node.url);
+    });
+    (node.media && node.media.edges || []).forEach(function (e) {
+      var n = e.node;
+      if (n.image) add(n.image.url);
+    });
+
+    return list;
+  }
+
   function normalizeProduct(node) {
     var overrides = (window.ZC_PRODUCT_OVERRIDES || {})[node.handle] || {};
     var variants = (node.variants.edges || []).map(function (e) {
@@ -86,19 +138,20 @@
     });
 
     var minPrice = node.priceRange.minVariantPrice;
-    var images = (node.images && node.images.edges || []).map(function (e) {
-      return e.node.url;
-    });
+    var images = collectImages(node);
+    var rawDesc = overrides.description || node.description || '';
+    var parsed  = parseDescription(rawDesc);
 
     return {
       id: node.handle,
       handle: node.handle,
       gid: node.id,
       name: overrides.displayName || node.title,
-      description: overrides.description || node.description || '',
+      description: rawDesc,
+      shortDescription: overrides.shortDescription || parsed.summary || '',
+      sizeGuideHtml: parsed.sizeGuideHtml,
       ribbon: overrides.ribbon || '',
       mockupImage: overrides.mockupImage || null,
-      useBlend: !overrides.mockupImage,
       image: node.featuredImage ? node.featuredImage.url : null,
       images: images,
       price: formatMoney(minPrice.amount, minPrice.currencyCode),

@@ -100,9 +100,8 @@
     }
 
     if (imgUrl) {
-      var blendClass = product.useBlend ? ' product-img--blend' : '';
       return [
-        '<div class="product-img' + blendClass + '">',
+        '<div class="product-img">',
         '  <img class="product-card-img" src="' + esc(imgUrl) + '" alt="' + esc(product.name) + '" loading="lazy" />',
         '  ' + ribbon,
         '</div>'
